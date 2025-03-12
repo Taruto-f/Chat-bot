@@ -1,0 +1,17 @@
+{
+  "name": "api",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@line/bot-sdk": "^9.7.1",
+    "@types/express": "^5.0.0",
+    "express": "^4.21.2",
+    "hono": "^4.7.4"
+  }
+}
