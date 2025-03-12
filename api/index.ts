@@ -242,10 +242,13 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
     return;
   } else if (userMessage === "スコア") {
     const userId = event.source?.userId || 'anonymous';
-    const score = userScores[userId] || 0;
+    // スコアが未定義の場合は0で初期化
+    if (userScores[userId] === undefined) {
+      userScores[userId] = 0;
+    }
     await client.replyMessage({
       replyToken: event.replyToken,
-      messages: [{ type: 'text', text: `あなたの現在のスコアは ${score} 点です！` }],
+      messages: [{ type: 'text', text: `あなたの現在のスコアは ${userScores[userId]} 点です！` }],
     });
   } else if (userMessage === "リセット") {
     const userId = event.source?.userId || 'anonymous';
