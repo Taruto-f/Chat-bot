@@ -47,6 +47,70 @@ const currentQuestions: { [key: string]: { question: string; answer: string } } 
 // Express アプリの作成
 const app: Application = express();
 
+// クイズの問題リストを定数として定義
+const QUIZ_QUESTIONS = [
+  {
+    question: "日本の首都は？",
+    answer: "東京"
+  },
+  {
+    question: "1+1は？",
+    answer: "2"
+  },
+  {
+    question: "世界で一番大きな大陸は？",
+    answer: "ユーラシア"
+  },
+  {
+    question: "太陽系で一番大きな惑星は？",
+    answer: "木星"
+  },
+  {
+    question: "日本の国鳥は？",
+    answer: "キジ"
+  },
+  {
+    question: "世界で一番長い川は？",
+    answer: "ナイル川"
+  },
+  {
+    question: "日本の国花は？",
+    answer: "桜"
+  },
+  {
+    question: "世界で一番高い山は？",
+    answer: "エベレスト"
+  },
+  {
+    question: "日本の国魚は？",
+    answer: "錦鯉"
+  },
+  {
+    question: "世界で一番大きな海は？",
+    answer: "太平洋"
+  },
+  {
+    question: "南アフリカにある世界遺産は？",
+    answer: "ロック岩"
+  },
+  {
+    question: "世界で一番大きな湖は？",
+    answer: "バイカル湖"
+  },
+  {
+    question: "世界で一番大きな火山は？",
+    answer: "マウント・エベレスト"
+  },
+  {
+    question: "世界で一番大きな砂漠は？",
+    answer: "サハラ砂漠"
+  } 
+];
+
+// 次の問題を取得する関数
+const getNextQuestion = () => {
+  return QUIZ_QUESTIONS[Math.floor(Math.random() * QUIZ_QUESTIONS.length)];
+};
 
 // ✅ LINE Bot のメッセージ処理
 const textEventHandler = async (event: webhook.Event): Promise<MessageAPIResponseBase | undefined> => {
@@ -131,79 +195,21 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
   } else if (userMessage === "クイズ") {
     const userId = event.source?.userId || 'anonymous';
     quizStates[userId] = true;
-    const questions = [
-      {
-        question: "日本の首都は？",
-        answer: "東京"
-      },
-      {
-        question: "1+1は？",
-        answer: "2"
-      },
-      {
-        question: "世界で一番大きな大陸は？",
-        answer: "ユーラシア"
-      },
-      {
-        question: "太陽系で一番大きな惑星は？",
-        answer: "木星"
-      },
-      {
-        question: "日本の国鳥は？",
-        answer: "キジ"
-      },
-      {
-        question: "世界で一番長い川は？",
-        answer: "ナイル川"
-      },
-      {
-        question: "日本の国花は？",
-        answer: "桜"
-      },
-      {
-        question: "世界で一番高い山は？",
-        answer: "エベレスト"
-      },
-      {
-        question: "日本の国魚は？",
-        answer: "錦鯉"
-      },
-      {
-        question: "世界で一番大きな海は？",
-        answer: "太平洋"
-      },
-      {
-        question: "南アフリカにある世界遺産は？",
-        answer: "ロック岩"
-      },
-      {
-        question: "世界で一番大きな湖は？",
-        answer: "バイカル湖"
-      },
-      {
-        question: "世界で一番大きな火山は？",
-        answer: "マウント・エベレスト"
-      },
-      {
-        question: "世界で一番大きな砂漠は？",
-        answer: "サハラ砂漠"
-      } 
-    ];
-    const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
     
-    // ユーザーのスコアを初期化（存在しない場合）
-    if (!userScores[userId]) {
+    // スコアが未定義の場合は0で初期化
+    if (userScores[userId] === undefined) {
       userScores[userId] = 0;
     }
 
-    // 現在の問題と答えを保存
-    currentQuestions[userId] = randomQuestion;
+    // 最初の問題を表示
+    const firstQuestion = getNextQuestion();
+    currentQuestions[userId] = firstQuestion;
 
     await client.replyMessage({
       replyToken: event.replyToken,
       messages: [
         { type: 'text', text: `現在のスコア: ${userScores[userId]}点` },
-        { type: 'text', text: randomQuestion.question },
+        { type: 'text', text: firstQuestion.question },
         { type: 'text', text: "答えを入力してください！" }
       ],
     });
@@ -215,15 +221,38 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
       replyToken: event.replyToken,
       messages: [{ type: 'text', text: "クイズを終了しました！" }],
     });
+  } else if (userMessage === "次のクイズ") {
+    const userId = event.source?.userId || 'anonymous';
+    if (quizStates[userId]) {
+      const nextQuestion = getNextQuestion();
+      currentQuestions[userId] = nextQuestion;
+      
+      await client.replyMessage({
+        replyToken: event.replyToken,
+        messages: [
+          { type: 'text', text: "次の問題です！" },
+          { type: 'text', text: nextQuestion.question },
+          { type: 'text', text: "答えを入力してください！" }
+        ],
+      });
+    } else {
+      await client.replyMessage({
+        replyToken: event.replyToken,
+        messages: [{ type: 'text', text: "クイズを開始するには「クイズ」と入力してください。" }],
+      });
+    }
   } else if (userMessage.startsWith("ANSWER:")) {
     // これは内部処理用のメッセージなので無視
     return;
   } else if (userMessage === "スコア") {
     const userId = event.source?.userId || 'anonymous';
-    const score = userScores[userId] || 0;
+    // スコアが未定義の場合は0で初期化
+    if (userScores[userId] === undefined) {
+      userScores[userId] = 0;
+    }
     await client.replyMessage({
       replyToken: event.replyToken,
-      messages: [{ type: 'text', text: `あなたの現在のスコアは ${score} 点です！` }],
+      messages: [{ type: 'text', text: `あなたの現在のスコアは ${userScores[userId]} 点です！` }],
     });
   } else if (userMessage === "リセット") {
     const userId = event.source?.userId || 'anonymous';
@@ -249,77 +278,6 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
             { type: 'text', text: `+10点！ 現在のスコア: ${userScores[userId]}点` }
           ],
         });
-
-        // 次の問題を表示
-        const questions = [
-          {
-            question: "日本の首都は？",
-            answer: "東京"
-          },
-          {
-            question: "1+1は？",
-            answer: "2"
-          },
-          {
-            question: "世界で一番大きな大陸は？",
-            answer: "ユーラシア"
-          },
-          {
-            question: "太陽系で一番大きな惑星は？",
-            answer: "木星"
-          },
-          {
-            question: "日本の国鳥は？",
-            answer: "キジ"
-          },
-          {
-            question: "世界で一番長い川は？",
-            answer: "ナイル川"
-          },
-          {
-            question: "日本の国花は？",
-            answer: "桜"
-          },
-          {
-            question: "世界で一番高い山は？",
-            answer: "エベレスト"
-          },
-          {
-            question: "日本の国魚は？",
-            answer: "錦鯉"
-          },
-          {
-            question: "世界で一番大きな海は？",
-            answer: "太平洋"
-          },
-          {
-            question: "南アフリカにある世界遺産は？",
-            answer: "ロック岩"
-          },
-          {
-            question: "世界で一番大きな湖は？",
-            answer: "バイカル湖"
-          },
-          {
-            question: "世界で一番大きな火山は？",
-            answer: "マウント・エベレスト"
-          },
-          {
-            question: "世界で一番大きな砂漠は？",
-            answer: "サハラ砂漠"
-          } 
-        ];
-        const nextQuestion = questions[Math.floor(Math.random() * questions.length)];
-        currentQuestions[userId] = nextQuestion;
-        
-        await client.replyMessage({
-          replyToken: event.replyToken,
-          messages: [
-            { type: 'text', text: "次の問題です！" },
-            { type: 'text', text: nextQuestion.question },
-            { type: 'text', text: "答えを入力してください！" }
-          ],
-        });
       } else {
         await client.replyMessage({
           replyToken: event.replyToken,
@@ -330,6 +288,19 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
           ],
         });
       }
+
+      // 次の問題を表示（正解・不正解どちらの場合も）
+      const nextQuestion = getNextQuestion();
+      currentQuestions[userId] = nextQuestion;
+      
+      await client.replyMessage({
+        replyToken: event.replyToken,
+        messages: [
+          { type: 'text', text: "次の問題です！" },
+          { type: 'text', text: nextQuestion.question },
+          { type: 'text', text: "答えを入力してください！" }
+        ],
+      });
     }
   }
 };
