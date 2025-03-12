@@ -10,6 +10,7 @@ import {
 } from '@line/bot-sdk';
 import express, { type Application, type Request, type Response } from 'express';
 import admin from 'firebase-admin';
+import { getDatabase } from 'firebase-admin/database';
 
 // LINE Bot の設定
 const serviceAccount: Record<string, string> = JSON.parse(
@@ -32,6 +33,9 @@ const PORT = process.env.PORT || 3000;
 
 // LINE SDK クライアントの作成
 const client = new messagingApi.MessagingApiClient(clientConfig);
+
+const db = getDatabase();
+const ref = db.ref("data");
 
 // ユーザースコアを管理するためのグローバル変数
 const userScores: { [key: string]: number } = {};
