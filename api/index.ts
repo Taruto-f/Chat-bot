@@ -235,7 +235,36 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
       
       // 前回の問題の答えを取得（実際の実装では、より適切な方法で問題と答えを管理する必要があります）
       const questions = [
-        "東京", "2", "ユーラシア", "木星", "キジ", "ナイル川", "桜", "エベレスト", "錦鯉", "太平洋","ロック岩","バイカル湖","マウント・エベレスト","サハラ砂漠"
+        "日本の首都は？",
+        "1+1は？",
+        "世界で一番大きな大陸は？",
+        "太陽系で一番大きな惑星は？",
+        "日本の国鳥は？",
+        "世界で一番長い川は？",
+        "日本の国花は？",
+        "世界で一番高い山は？",
+        "日本の国魚は？",
+        "世界で一番大きな海は？",
+        "南アフリカにある世界遺産は？",
+        "世界で一番大きな湖は？",
+        "世界で一番大きな火山は？",
+        "世界で一番大きな砂漠は？"
+      ];
+      const answers = [
+        "東京",
+        "2",
+        "ユーラシア",
+        "木星",
+        "キジ",
+        "ナイル川",
+        "桜",
+        "エベレスト",
+        "錦鯉",
+        "太平洋",
+        "ロック岩",
+        "バイカル湖",
+        "マウント・エベレスト",
+        "サハラ砂漠"
       ];
       
       if (questions.includes(lastMessage)) {
@@ -247,6 +276,23 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
             { type: 'text', text: `+10点！ 現在のスコア: ${userScores[userId]}点` }
           ],
         });
+
+        // 次の問題を表示
+        const randomIndex = Math.floor(Math.random() * questions.length);
+        const nextQuestion = questions[randomIndex];
+        const nextAnswer = answers[randomIndex];
+        
+        await client.replyMessage({
+          replyToken: event.replyToken,
+          messages: [
+            { type: 'text', text: "次の問題です！" },
+            { type: 'text', text: nextQuestion },
+            { type: 'text', text: "答えを入力してください！" }
+          ],
+        });
+
+        // 問題と答えを一時的に保存
+        event.message.text = `ANSWER:${nextAnswer}`;
       } else {
         await client.replyMessage({
           replyToken: event.replyToken,
