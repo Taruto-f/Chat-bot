@@ -9,15 +9,24 @@ import {
   HTTPFetchError,
 } from '@line/bot-sdk';
 import express, { type Application, type Request, type Response } from 'express';
+import admin from 'firebase-admin';
 
 // LINE Bot の設定
+const serviceAccount: Record<string, string> = JSON.parse(
+    process.env.FIREBASE_ADMIN!
+);
 const clientConfig: ClientConfig = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN || '',
 };
 
 const middlewareConfig: MiddlewareConfig = {
   channelSecret: process.env.CHANNEL_SECRET || '',
+
 };
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: process.env.FIREBASE_DATABASE,
+});
 
 const PORT = process.env.PORT || 3000;
 
@@ -127,7 +136,7 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
       },
       {
         question: "世界で一番大きな大陸は？",
-        answer: "アジア"
+        answer: "ユーラシア"
       },
       {
         question: "太陽系で一番大きな惑星は？",
@@ -226,7 +235,7 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
       
       // 前回の問題の答えを取得（実際の実装では、より適切な方法で問題と答えを管理する必要があります）
       const questions = [
-        "東京", "2", "アジア", "木星", "キジ", "ナイル川", "桜", "エベレスト", "錦鯉", "太平洋","ロック岩","バイカル湖","マウント・エベレスト","サハラ砂漠"
+        "東京", "2", "ユーラシア", "木星", "キジ", "ナイル川", "桜", "エベレスト", "錦鯉", "太平洋","ロック岩","バイカル湖","マウント・エベレスト","サハラ砂漠"
       ];
       
       if (questions.includes(lastMessage)) {
