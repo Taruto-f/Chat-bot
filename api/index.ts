@@ -192,8 +192,8 @@ const textEventHandler = async (event: webhook.Event): Promise<MessageAPIRespons
     const userId = event.source?.userId || 'anonymous';
     quizStates[userId] = true;
     
-    // ユーザーのスコアを初期化（存在しない場合）
-    if (!userScores[userId]) {
+    // スコアが未定義の場合は0で初期化
+    if (userScores[userId] === undefined) {
       userScores[userId] = 0;
     }
 
