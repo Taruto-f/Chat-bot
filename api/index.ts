@@ -15,7 +15,7 @@ import express, {
 } from "express";
 import admin from "firebase-admin";
 import { getDatabase, type Reference } from "firebase-admin/database";
-import type { Config } from "./config";
+import { defaultConfig, type Config } from "./config";
 import { get } from "./db";
 
 // LINE Bot の設定
@@ -378,6 +378,10 @@ app.post(
 					if (child === undefined) {
 						throw new Error("child is undefined");
 					}
+
+					const config: Config = await get(child);
+					await child.set(Object.assign({}, defaultConfig, config));
+
 					await textEventHandler(event, child);
 				} catch (err: unknown) {
 					if (err instanceof HTTPFetchError) {
