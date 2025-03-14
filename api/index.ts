@@ -351,6 +351,10 @@ const textEventHandler = async (
 					type: "textV2",
 					text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP")}`,
 				},
+				{
+					type: "textV2",
+					text: `発表者: ${forecast.publishingOffice}`,
+				},
 			],
 		});
 		// } catch (error) {
