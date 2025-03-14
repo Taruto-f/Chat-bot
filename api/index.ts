@@ -151,7 +151,7 @@ const textEventHandler = async (
 
 	async function update(db: Reference, new_config: Partial<Config>) {
 		await db.update(new_config);
-		config = await get(db);
+		config = await get(ref);
 	}
 
 	const quizScoreRef = ref.child("user_scores");
