@@ -158,37 +158,37 @@ const textEventHandler = async (
 		const result = Math.random() < 0.5 ? "Yes" : "No";
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: result }],
+			messages: [{ type: "textV2", text: result }],
 		});
 	} else if (userMessage === "数字") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: String(Math.random()) }],
+			messages: [{ type: "textV2", text: String(Math.random()) }],
 		});
 	} else if (/ありがとう/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "どういたしまして" }],
+			messages: [{ type: "textV2", text: "どういたしまして" }],
 		});
 	} else if (/さようなら/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "またね" }],
+			messages: [{ type: "textV2", text: "またね" }],
 		});
 	} else if (/おはようございます/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "おはようございます" }],
+			messages: [{ type: "textV2", text: "おはようございます" }],
 		});
 	} else if (/こんにちは/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "こんにちは" }],
+			messages: [{ type: "textV2", text: "こんにちは" }],
 		});
 	} else if (/こんばんは/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "こんばんは" }],
+			messages: [{ type: "textV2", text: "こんばんは" }],
 		});
 	} else if (userMessage === "占い") {
 		const fortunes = [
@@ -205,8 +205,8 @@ const textEventHandler = async (
 		await client.replyMessage({
 			replyToken: event.replyToken,
 			messages: [
-				{ type: "text", text: `今日の運勢：${fortune}` },
-				{ type: "text", text: `ラッキーカラー：${luckyColor}` },
+				{ type: "textV2", text: `今日の運勢：${fortune}` },
+				{ type: "textV2", text: `ラッキーカラー：${luckyColor}` },
 			],
 		});
 	}
@@ -215,7 +215,7 @@ const textEventHandler = async (
 		const alphabet = String.fromCharCode(65 + Math.floor(Math.random() * 26));
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: alphabet }],
+			messages: [{ type: "textV2", text: alphabet }],
 		});
 	} else if (userMessage === "クイズ") {
 		const userId = event.source?.userId || "anonymous";
@@ -240,9 +240,12 @@ const textEventHandler = async (
 		await client.replyMessage({
 			replyToken: event.replyToken,
 			messages: [
-				{ type: "text", text: `現在のスコア: ${config.user_scores[userId]}点` },
-				{ type: "text", text: firstQuestion.question },
-				{ type: "text", text: "答えを入力してください！" },
+				{
+					type: "textV2",
+					text: `現在のスコア: ${config.user_scores[userId]}点`,
+				},
+				{ type: "textV2", text: firstQuestion.question },
+				{ type: "textV2", text: "答えを入力してください！" },
 			],
 		});
 	} else if (userMessage === "クイズ終了") {
@@ -250,7 +253,7 @@ const textEventHandler = async (
 		await update({ quiz_status: false });
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "クイズを終了しました！" }],
+			messages: [{ type: "textV2", text: "クイズを終了しました！" }],
 		});
 	} else if (userMessage === "次のクイズ") {
 		if (config.quiz_status) {
@@ -261,9 +264,9 @@ const textEventHandler = async (
 			await client.replyMessage({
 				replyToken: event.replyToken,
 				messages: [
-					{ type: "text", text: "次の問題です！" },
-					{ type: "text", text: nextQuestion.question },
-					{ type: "text", text: "答えを入力してください！" },
+					{ type: "textV2", text: "次の問題です！" },
+					{ type: "textV2", text: nextQuestion.question },
+					{ type: "textV2", text: "答えを入力してください！" },
 				],
 			});
 		} else {
@@ -271,7 +274,7 @@ const textEventHandler = async (
 				replyToken: event.replyToken,
 				messages: [
 					{
-						type: "text",
+						type: "textV2",
 						text: "クイズを開始するには「クイズ」と入力してください。",
 					},
 				],
@@ -294,7 +297,7 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [
 				{
-					type: "text",
+					type: "textV2",
 					text: `あなたの現在のスコアは ${config.user_scores[userId]} 点です！`,
 				},
 			],
@@ -308,13 +311,13 @@ const textEventHandler = async (
 		});
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "スコアをリセットしました！" }],
+			messages: [{ type: "textV2", text: "スコアをリセットしました！" }],
 		});
 	} else if (userMessage === "!!db") {
 		// デバッグ用　データベース出力
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "text", text: JSON.stringify(await get(ref)) }],
+			messages: [{ type: "textV2", text: JSON.stringify(await get(ref)) }],
 		});
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
@@ -323,9 +326,16 @@ const textEventHandler = async (
 		if (config.quiz_status) {
 			const currentQuestion = QUIZ_QUESTIONS[config.current_question];
 			const userAnswer = userMessage.trim();
+			const nextQuestionId = getNextQuestion();
+			await update({ current_question: nextQuestionId });
+			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
+			const nextQuestionMessage: { type: "textV2"; text: string }[] = [
+				{ type: "textV2", text: "次の問題です！" },
+				{ type: "textV2", text: nextQuestion.question },
+				{ type: "textV2", text: "答えを入力してください！" },
+			];
 
 			if (userAnswer === currentQuestion.answer) {
-				// userScores[userId] = (userScores[userId] || 0) + 10;
 				await update({
 					user_scores: {
 						[userId]: (config.user_scores[userId] ?? 0) + 10,
@@ -334,43 +344,31 @@ const textEventHandler = async (
 				await client.replyMessage({
 					replyToken: event.replyToken,
 					messages: [
-						{ type: "text", text: "正解です！" },
+						{ type: "textV2", text: "正解です！" },
 						{
-							type: "text",
+							type: "textV2",
 							text: `+10点！ 現在のスコア: ${config.user_scores[userId]}点`,
 						},
+						...nextQuestionMessage,
 					],
 				});
 			} else {
 				await client.replyMessage({
 					replyToken: event.replyToken,
 					messages: [
-						{ type: "text", text: "残念ながら不正解です。" },
+						{ type: "textV2", text: "残念ながら不正解です。" },
 						{
-							type: "text",
+							type: "textV2",
 							text: `正解は「${currentQuestion.answer}」でした。`,
 						},
 						{
-							type: "text",
+							type: "textV2",
 							text: `現在のスコア: ${config.user_scores[userId]}点`,
 						},
+						...nextQuestionMessage,
 					],
 				});
 			}
-
-			// 次の問題を表示（正解・不正解どちらの場合も）
-			const nextQuestionId = getNextQuestion();
-			await update({ current_question: nextQuestionId });
-			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
-
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{ type: "text", text: "次の問題です！" },
-					{ type: "text", text: nextQuestion.question },
-					{ type: "text", text: "答えを入力してください！" },
-				],
-			});
 		}
 	}
 };
