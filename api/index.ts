@@ -356,10 +356,9 @@ const textEventHandler = async (
 				await client.replyMessage({
 					replyToken: event.replyToken,
 					messages: [
-						{ type: "textV2", text: "残念ながら不正解です。" },
 						{
 							type: "textV2",
-							text: `正解は「${currentQuestion.answer}」でした。`,
+							text: `残念ながら不正解です。\n正解は「${currentQuestion.answer}」でした。`,
 						},
 						{
 							type: "textV2",
