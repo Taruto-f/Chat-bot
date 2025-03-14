@@ -46,62 +46,86 @@ const app: Application = express();
 
 // クイズの問題リストを定数として定義
 const QUIZ_QUESTIONS = [
-	{
-		question: "日本の首都は？",
-		answer: "東京",
-	},
-	{
-		question: "1+1は？",
-		answer: "2",
-	},
-	{
-		question: "世界で一番大きな大陸は？",
-		answer: "ユーラシア",
-	},
-	{
-		question: "太陽系で一番大きな惑星は？",
-		answer: "木星",
-	},
-	{
-		question: "日本の国鳥は？",
-		answer: "キジ",
-	},
-	{
-		question: "世界で一番長い川は？",
-		answer: "ナイル川",
-	},
-	{
-		question: "日本の国花は？",
-		answer: "桜",
-	},
-	{
-		question: "世界で一番高い山は？",
-		answer: "エベレスト",
-	},
-	{
-		question: "日本の国魚は？",
-		answer: "錦鯉",
-	},
-	{
-		question: "世界で一番大きな海は？",
-		answer: "太平洋",
-	},
-	{
-		question: "南アフリカにある世界遺産は？",
-		answer: "ロック岩",
-	},
-	{
-		question: "世界で一番大きな湖は？",
-		answer: "バイカル湖",
-	},
-	{
-		question: "世界で一番大きな火山は？",
-		answer: "マウント・エベレスト",
-	},
-	{
-		question: "世界で一番大きな砂漠は？",
-		answer: "サハラ砂漠",
-	},
+  {
+    question: "日本の首都は？",
+    answer: "東京"
+  },
+  {
+    question: "1+1は？",
+    answer: "2"
+  },
+  {
+    question: "世界で一番大きな大陸は？",
+    answer: "ユーラシア"
+  },
+  {
+    question: "太陽系で一番大きな惑星は？",
+    answer: "木星"
+  },
+  {
+    question: "日本の国鳥は？",
+    answer: "キジ"
+  },
+  {
+    question: "世界で一番長い川は？",
+    answer: "ナイル川"
+  },
+  {
+    question: "日本の国花は？",
+    answer: "桜"
+  },
+  {
+    question: "世界で一番高い山は？",
+    answer: "エベレスト"
+  },
+  {
+    question: "日本の国魚は？",
+    answer: "錦鯉"
+  },
+  {
+    question: "世界で一番大きな海は？",
+    answer: "太平洋"
+  },
+  {
+    question: "南アフリカにある世界遺産は？",
+    answer: "ロック岩"
+  },
+  {
+    question: "世界で一番大きな湖は？",
+    answer: "バイカル湖"
+  },
+  {
+    question: "世界で一番大きな火山は？",
+    answer: "マウント・エベレスト"
+  },
+  {
+    question: "世界で一番大きな砂漠は？",
+    answer: "サハラ砂漠"
+  },
+  {
+    question: "日本の国歌は？",
+    answer: "君が代"
+  },
+  {
+    question: "世界で一番大きな国は？",
+    answer: "ロシア"
+  },
+  {
+    question: "日本の国技は？",
+    answer: "相撲"
+  },
+  {
+    question: "世界で一番人口の多い国は？",
+    answer: "中国"
+  },
+  {
+    question: "日本の国石は？",
+    answer: "翡翠"
+  },
+  {
+    question: "世界で一番大きな島は？",
+    answer: "グリーンランド"
+  }
 ];
 
 // 次の問題を取得する関数
