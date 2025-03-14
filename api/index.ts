@@ -149,10 +149,12 @@ const textEventHandler = async (
 	// db
 	let config: Config = await get(ref);
 
-	async function update(new_config: Partial<Config>) {
-		await ref.update(new_config);
-		config = await get(ref);
+	async function update(db: Reference, new_config: Partial<Config>) {
+		await db.update(new_config);
+		config = await get(db);
 	}
+
+	const quizScoreRef = ref.child("user_scores");
 
 	if (userMessage === "判定") {
 		const result = Math.random() < 0.5 ? "Yes" : "No";
@@ -219,20 +221,18 @@ const textEventHandler = async (
 		});
 	} else if (userMessage === "クイズ") {
 		const userId = event.source?.userId || "anonymous";
-		await update({ quiz_status: true });
+		await update(ref, { quiz_status: true });
 
 		// スコアが未定義の場合は0で初期化
 		if (config.user_scores[userId] === undefined) {
-			await update({
-				user_scores: {
-					[userId]: 0,
-				},
+			await update(quizScoreRef, {
+				[userId]: 0,
 			});
 		}
 
 		// 最初の問題を表示
 		const firstQuestionId = getNextQuestion();
-		await update({
+		await update(ref, {
 			current_question: firstQuestionId,
 		});
 		const firstQuestion = QUIZ_QUESTIONS[firstQuestionId];
@@ -250,7 +250,7 @@ const textEventHandler = async (
 		});
 	} else if (userMessage === "クイズ終了") {
 		const userId = event.source?.userId ?? "anonymous";
-		await update({ quiz_status: false });
+		await update(ref, { quiz_status: false });
 		await client.replyMessage({
 			replyToken: event.replyToken,
 			messages: [{ type: "textV2", text: "クイズを終了しました！" }],
@@ -258,7 +258,7 @@ const textEventHandler = async (
 	} else if (userMessage === "次のクイズ") {
 		if (config.quiz_status) {
 			const nextQuestionId = getNextQuestion();
-			await update({ current_question: nextQuestionId });
+			await update(ref, { current_question: nextQuestionId });
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
 
 			await client.replyMessage({
@@ -287,10 +287,8 @@ const textEventHandler = async (
 		const userId = event.source?.userId || "anonymous";
 		// スコアが未定義の場合は0で初期化
 		if (config.user_scores[userId] === undefined) {
-			await update({
-				user_scores: {
-					[userId]: 0,
-				},
+			await update(quizScoreRef, {
+				[userId]: 0,
 			});
 		}
 		await client.replyMessage({
@@ -304,10 +302,8 @@ const textEventHandler = async (
 		});
 	} else if (userMessage === "リセット") {
 		const userId = event.source?.userId ?? "anonymous";
-		await update({
-			user_scores: {
-				[userId]: 0,
-			},
+		await update(quizScoreRef, {
+			[userId]: 0,
 		});
 		await client.replyMessage({
 			replyToken: event.replyToken,
@@ -328,7 +324,7 @@ const textEventHandler = async (
 			const currentQuestion = QUIZ_QUESTIONS[config.current_question];
 			const userAnswer = userMessage.trim();
 			const nextQuestionId = getNextQuestion();
-			await update({ current_question: nextQuestionId });
+			await update(ref, { current_question: nextQuestionId });
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
 			const nextQuestionMessage: { type: "textV2"; text: string }[] = [
 				{ type: "textV2", text: "次の問題です！" },
@@ -337,10 +333,8 @@ const textEventHandler = async (
 			];
 
 			if (userAnswer === currentQuestion.answer) {
-				await update({
-					user_scores: {
-						[userId]: (config.user_scores[userId] ?? 0) + 10,
-					},
+				await update(quizScoreRef, {
+					[userId]: (config.user_scores[userId] ?? 0) + 10,
 				});
 				await client.replyMessage({
 					replyToken: event.replyToken,
