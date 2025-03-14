@@ -6,6 +6,8 @@ export interface Config {
 
 export const defaultConfig: Config = {
 	quiz_status: false,
-	user_scores: {},
+	user_scores: {
+		dammy: 0,
+	},
 	current_question: 0,
 };
