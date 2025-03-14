@@ -340,31 +340,31 @@ const textEventHandler = async (
 			messages: [{ type: "text", text: json }],
 		});
 	} else if (userMessage === "天気") {
-		try {
-			const forecast = await getWeatherForecast();
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{ type: "textV2", text: `【${forecast.targetArea}の天気予報】` },
-					{ type: "textV2", text: forecast.headlineText },
-					{ type: "textV2", text: forecast.text },
-					{
-						type: "textV2",
-						text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP")}`,
-					},
-				],
-			});
-		} catch (error) {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "textV2",
-						text: "申し訳ありません。天気予報の取得に失敗しました。",
-					},
-				],
-			});
-		}
+		// try {
+		const forecast = await getWeatherForecast();
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [
+				{ type: "textV2", text: `【${forecast.targetArea}の天気予報】` },
+				{ type: "textV2", text: forecast.headlineText },
+				{ type: "textV2", text: forecast.text },
+				{
+					type: "textV2",
+					text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP")}`,
+				},
+			],
+		});
+		// } catch (error) {
+		// 	await client.replyMessage({
+		// 		replyToken: event.replyToken,
+		// 		messages: [
+		// 			{
+		// 				type: "textV2",
+		// 				text: "申し訳ありません。天気予報の取得に失敗しました。",
+		// 			},
+		// 		],
+		// 	});
+		// }
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
 
