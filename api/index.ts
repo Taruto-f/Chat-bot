@@ -265,7 +265,7 @@ const textEventHandler = async (
 				replyToken: event.replyToken,
 				messages: [
 					{ type: "textV2", text: "次の問題です！" },
-					{ type: "textV2", text: nextQuestion.question },
+					{ type: "textV2", text: `Q. ${nextQuestion.question}` },
 					{ type: "textV2", text: "答えを入力してください！" },
 				],
 			});
@@ -331,7 +331,7 @@ const textEventHandler = async (
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
 			const nextQuestionMessage: { type: "textV2"; text: string }[] = [
 				{ type: "textV2", text: "次の問題です！" },
-				{ type: "textV2", text: nextQuestion.question },
+				{ type: "textV2", text: `Q. ${nextQuestion.question}` },
 				{ type: "textV2", text: "答えを入力してください！" },
 			];
 
