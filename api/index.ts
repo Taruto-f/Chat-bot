@@ -315,9 +315,12 @@ const textEventHandler = async (
 		});
 	} else if (userMessage === "!!db") {
 		// デバッグ用　データベース出力
+		const json = JSON.stringify(await get(ref));
+		json.replaceAll("{", "{{");
+		json.replaceAll("}", "}}");
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: JSON.stringify(await get(ref)) }],
+			messages: [{ type: "textV2", text: json }],
 		});
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
