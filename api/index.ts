@@ -346,7 +346,6 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [
 				{ type: "textV2", text: `【${forecast.targetArea}の天気予報】` },
-				{ type: "textV2", text: forecast.headlineText },
 				{ type: "textV2", text: forecast.text },
 				{
 					type: "textV2",
