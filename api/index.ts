@@ -30,28 +30,15 @@ interface WeatherForecast {
 
 // 天気予報を取得する関数
 async function getWeatherForecast(): Promise<WeatherForecast> {
-	try {
-		const response = await axios.get<WeatherForecast>(
-			"https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json",
-			{
-				headers: {
-					'User-Agent': 'WeatherBot/1.0'
-				}
-			}
-		);
-		return response.data;
-	} catch (error) {
-		if (axios.isAxiosError(error)) {
-			console.error("天気予報の取得に失敗しました:", {
-				status: error.response?.status,
-				message: error.message,
-				url: error.config?.url
-			});
-		} else {
-			console.error("予期せぬエラーが発生しました:", error);
-		}
-		throw new Error("天気予報の取得に失敗しました。しばらく時間をおいて再度お試しください。");
-	}
+	const response = await axios.get<WeatherForecast>(
+		"https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json",
+		{
+			headers: {
+				"User-Agent": "WeatherBot/1.0",
+			},
+		},
+	);
+	return response.data;
 }
 
 // LINE Bot の設定
@@ -361,13 +348,21 @@ const textEventHandler = async (
 					{ type: "textV2", text: `【${forecast.targetArea}の天気予報】` },
 					{ type: "textV2", text: forecast.headlineText },
 					{ type: "textV2", text: forecast.text },
-					{ type: "textV2", text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP")}` },
+					{
+						type: "textV2",
+						text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP")}`,
+					},
 				],
 			});
 		} catch (error) {
 			await client.replyMessage({
 				replyToken: event.replyToken,
-				messages: [{ type: "textV2", text: "申し訳ありません。天気予報の取得に失敗しました。" }],
+				messages: [
+					{
+						type: "textV2",
+						text: "申し訳ありません。天気予報の取得に失敗しました。",
+					},
+				],
 			});
 		}
 	} else {
