@@ -17,6 +17,29 @@ import admin from "firebase-admin";
 import { getDatabase, type Reference } from "firebase-admin/database";
 import { defaultConfig, type Config } from "./config";
 import { get } from "./db";
+import axios from "axios";
+
+// 天気予報データの型定義
+interface WeatherForecast {
+	publishingOffice: string;
+	reportDatetime: string;
+	targetArea: string;
+	headlineText: string;
+	text: string;
+}
+
+// 天気予報を取得する関数
+async function getWeatherForecast(): Promise<WeatherForecast> {
+	try {
+		const response = await axios.get<WeatherForecast>(
+			"https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json",
+		);
+		return response.data;
+	} catch (error) {
+		console.error("天気予報の取得に失敗しました:", error);
+		throw error;
+	}
+}
 
 // LINE Bot の設定
 const serviceAccount: Record<string, string> = JSON.parse(
@@ -316,6 +339,24 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [{ type: "text", text: json }],
 		});
+	} else if (userMessage === "天気") {
+		try {
+			const forecast = await getWeatherForecast();
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{ type: "textV2", text: `【${forecast.targetArea}の天気予報】` },
+					{ type: "textV2", text: forecast.headlineText },
+					{ type: "textV2", text: forecast.text },
+					{ type: "textV2", text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP")}` },
+				],
+			});
+		} catch (error) {
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [{ type: "textV2", text: "申し訳ありません。天気予報の取得に失敗しました。" }],
+			});
+		}
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
 
