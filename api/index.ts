@@ -46,86 +46,86 @@ const app: Application = express();
 
 // クイズの問題リストを定数として定義
 const QUIZ_QUESTIONS = [
-  {
-    question: "日本の首都は？",
-    answer: "東京"
-  },
-  {
-    question: "1+1は？",
-    answer: "2"
-  },
-  {
-    question: "世界で一番大きな大陸は？",
-    answer: "ユーラシア"
-  },
-  {
-    question: "太陽系で一番大きな惑星は？",
-    answer: "木星"
-  },
-  {
-    question: "日本の国鳥は？",
-    answer: "キジ"
-  },
-  {
-    question: "世界で一番長い川は？",
-    answer: "ナイル川"
-  },
-  {
-    question: "日本の国花は？",
-    answer: "桜"
-  },
-  {
-    question: "世界で一番高い山は？",
-    answer: "エベレスト"
-  },
-  {
-    question: "日本の国魚は？",
-    answer: "錦鯉"
-  },
-  {
-    question: "世界で一番大きな海は？",
-    answer: "太平洋"
-  },
-  {
-    question: "南アフリカにある世界遺産は？",
-    answer: "ロック岩"
-  },
-  {
-    question: "世界で一番大きな湖は？",
-    answer: "バイカル湖"
-  },
-  {
-    question: "世界で一番大きな火山は？",
-    answer: "マウント・エベレスト"
-  },
-  {
-    question: "世界で一番大きな砂漠は？",
-    answer: "サハラ砂漠"
-  },
-  {
-    question: "日本の国歌は？",
-    answer: "君が代"
-  },
-  {
-    question: "世界で一番大きな国は？",
-    answer: "ロシア"
-  },
-  {
-    question: "日本の国技は？",
-    answer: "相撲"
-  },
-  {
-    question: "世界で一番人口の多い国は？",
-    answer: "中国"
-  },
-  {
-    question: "日本の国石は？",
-    answer: "翡翠"
-  },
-  {
-    question: "世界で一番大きな島は？",
-    answer: "グリーンランド"
-  }
+	{
+		question: "日本の首都は？",
+		answer: "東京",
+	},
+	{
+		question: "1+1は？",
+		answer: "2",
+	},
+	{
+		question: "世界で一番大きな大陸は？",
+		answer: "ユーラシア",
+	},
+	{
+		question: "太陽系で一番大きな惑星は？",
+		answer: "木星",
+	},
+	{
+		question: "日本の国鳥は？",
+		answer: "キジ",
+	},
+	{
+		question: "世界で一番長い川は？",
+		answer: "ナイル川",
+	},
+	{
+		question: "日本の国花は？",
+		answer: "桜",
+	},
+	{
+		question: "世界で一番高い山は？",
+		answer: "エベレスト",
+	},
+	{
+		question: "日本の国魚は？",
+		answer: "錦鯉",
+	},
+	{
+		question: "世界で一番大きな海は？",
+		answer: "太平洋",
+	},
+	{
+		question: "南アフリカにある世界遺産は？",
+		answer: "ロック岩",
+	},
+	{
+		question: "世界で一番大きな湖は？",
+		answer: "バイカル湖",
+	},
+	{
+		question: "世界で一番大きな火山は？",
+		answer: "マウント・エベレスト",
+	},
+	{
+		question: "世界で一番大きな砂漠は？",
+		answer: "サハラ砂漠",
+	},
+	{
+		question: "日本の国歌は？",
+		answer: "君が代",
+	},
+	{
+		question: "世界で一番大きな国は？",
+		answer: "ロシア",
+	},
+	{
+		question: "日本の国技は？",
+		answer: "相撲",
+	},
+	{
+		question: "世界で一番人口の多い国は？",
+		answer: "中国",
+	},
+	{
+		question: "日本の国石は？",
+		answer: "翡翠",
+	},
+	{
+		question: "世界で一番大きな島は？",
+		answer: "グリーンランド",
+	},
 ];
 
 // 次の問題を取得する関数
@@ -219,11 +219,11 @@ const textEventHandler = async (
 		});
 	} else if (userMessage === "クイズ") {
 		const userId = event.source?.userId || "anonymous";
-		update({ quiz_status: true });
+		await update({ quiz_status: true });
 
 		// スコアが未定義の場合は0で初期化
 		if (config.user_scores[userId] === undefined) {
-			update({
+			await update({
 				user_scores: {
 					[userId]: 0,
 				},
@@ -232,7 +232,7 @@ const textEventHandler = async (
 
 		// 最初の問題を表示
 		const firstQuestionId = getNextQuestion();
-		update({
+		await update({
 			current_question: firstQuestionId,
 		});
 		const firstQuestion = QUIZ_QUESTIONS[firstQuestionId];
@@ -247,7 +247,7 @@ const textEventHandler = async (
 		});
 	} else if (userMessage === "クイズ終了") {
 		const userId = event.source?.userId ?? "anonymous";
-		update({ quiz_status: false });
+		await update({ quiz_status: false });
 		await client.replyMessage({
 			replyToken: event.replyToken,
 			messages: [{ type: "text", text: "クイズを終了しました！" }],
@@ -255,7 +255,7 @@ const textEventHandler = async (
 	} else if (userMessage === "次のクイズ") {
 		if (config.quiz_status) {
 			const nextQuestionId = getNextQuestion();
-			update({ current_question: nextQuestionId });
+			await update({ current_question: nextQuestionId });
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
 
 			await client.replyMessage({
@@ -284,7 +284,7 @@ const textEventHandler = async (
 		const userId = event.source?.userId || "anonymous";
 		// スコアが未定義の場合は0で初期化
 		if (config.user_scores[userId] === undefined) {
-			update({
+			await update({
 				user_scores: {
 					[userId]: 0,
 				},
@@ -301,7 +301,7 @@ const textEventHandler = async (
 		});
 	} else if (userMessage === "リセット") {
 		const userId = event.source?.userId ?? "anonymous";
-		update({
+		await update({
 			user_scores: {
 				[userId]: 0,
 			},
@@ -326,7 +326,7 @@ const textEventHandler = async (
 
 			if (userAnswer === currentQuestion.answer) {
 				// userScores[userId] = (userScores[userId] || 0) + 10;
-				update({
+				await update({
 					user_scores: {
 						[userId]: (config.user_scores[userId] ?? 0) + 10,
 					},
@@ -360,7 +360,7 @@ const textEventHandler = async (
 
 			// 次の問題を表示（正解・不正解どちらの場合も）
 			const nextQuestionId = getNextQuestion();
-			update({ current_question: nextQuestionId });
+			await update({ current_question: nextQuestionId });
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
 
 			await client.replyMessage({
