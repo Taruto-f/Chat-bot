@@ -295,7 +295,7 @@ const textEventHandler = async (
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
 
-		// クイズがアクティブな場合のみ答えをチェック
+		// クイズがアクティブな場合のみ答えをチェック!
 		if (config.quiz_status) {
 			const currentQuestion = QUIZ_QUESTIONS[config.current_question];
 			const userAnswer = userMessage.trim();
