@@ -32,12 +32,25 @@ interface WeatherForecast {
 async function getWeatherForecast(): Promise<WeatherForecast> {
 	try {
 		const response = await axios.get<WeatherForecast>(
-			"https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json",
+			"https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json",
+			{
+				headers: {
+					'User-Agent': 'WeatherBot/1.0'
+				}
+			}
 		);
 		return response.data;
 	} catch (error) {
-		console.error("天気予報の取得に失敗しました:", error);
-		throw error;
+		if (axios.isAxiosError(error)) {
+			console.error("天気予報の取得に失敗しました:", {
+				status: error.response?.status,
+				message: error.message,
+				url: error.config?.url
+			});
+		} else {
+			console.error("予期せぬエラーが発生しました:", error);
+		}
+		throw new Error("天気予報の取得に失敗しました。しばらく時間をおいて再度お試しください。");
 	}
 }
 
