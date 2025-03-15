@@ -484,6 +484,42 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [{ type: "textV2", text: kanji }],
 		});
+	} else if (userMessage === "機能") {
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [{
+				type: "text",
+				text: "以下のボタンから機能を選択してください。",
+				quickReply: {
+					items: [
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "天気予報",
+								text: "天気"
+							}
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "クイズ",
+								text: "クイズ"
+							}
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "占い",
+								text: "占い"
+							}
+						}
+					]
+				}
+			}]
+		});
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
 
