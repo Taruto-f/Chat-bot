@@ -1,4 +1,3 @@
-// ✅ インポートはファイルの最上部に配置
 import {
 	type ClientConfig,
 	type MessageAPIResponseBase,
@@ -296,14 +295,6 @@ const textEventHandler = async (
 				{ type: "textV2", text: `ラッキーカラー：${luckyColor}` },
 			],
 		});
-	}
-	//ランダムなアルファベット1文字
-	if (userMessage === "アルファベット") {
-		const alphabet = String.fromCharCode(65 + Math.floor(Math.random() * 26));
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: alphabet }],
-		});
 	} else if (userMessage === "クイズ") {
 		const userId = event.source?.userId || "anonymous";
 		await update(ref, { quiz_status: true });
@@ -546,6 +537,43 @@ const textEventHandler = async (
 					],
 				});
 			}
+		} else {
+			// クイズがアクティブでない場合は、クイックリプライを表示
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [{
+					type: "text",
+					text: "以下のボタンから機能を選択してください。",
+					quickReply: {
+						items: [
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "天気予報",
+									text: "天気"
+								}
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "クイズ",
+									text: "クイズ"
+								}
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "占い",
+									text: "占い"
+								}
+							}
+						]
+					}
+				}]
+			});
 		}
 	}
 };
