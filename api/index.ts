@@ -351,7 +351,7 @@ const textEventHandler = async (
 				messages: [
 					{
 						type: "textV2",
-						text: "「天気ゾーン (ゾーン番号)」と入力することで天気ゾーンを設定できます。天気ゾーン一覧はこちら: https://x.gd/lhdUU",
+						text: "「天気ゾーン (ゾーン番号)」と入力することで天気ゾーンを設定できます。\n天気ゾーン一覧はこちら: https://x.gd/lhdUU",
 					},
 					{
 						type: "textV2",
