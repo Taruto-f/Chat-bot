@@ -17,29 +17,7 @@ import admin from "firebase-admin";
 import { getDatabase, type Reference } from "firebase-admin/database";
 import { defaultConfig, type Config } from "./config";
 import { get } from "./db";
-import axios from "axios";
-
-// 天気予報データの型定義
-interface WeatherForecast {
-	publishingOffice: string;
-	reportDatetime: string;
-	targetArea: string;
-	headlineText: string;
-	text: string;
-}
-
-// 天気予報を取得する関数
-async function getWeatherForecast(): Promise<WeatherForecast> {
-	const response = await axios.get<WeatherForecast>(
-		"https://www.jma.go.jp/bosai/forecast/data/overview_forecast/130000.json",
-		{
-			headers: {
-				"User-Agent": "WeatherBot/1.0",
-			},
-		},
-	);
-	return response.data;
-}
+import { getWeatherForecast } from "./weather";
 
 // LINE Bot の設定
 const serviceAccount: Record<string, string> = JSON.parse(
@@ -176,6 +154,8 @@ const textEventHandler = async (
 		await db.update(new_config);
 		config = await get(ref);
 	}
+
+	const splitMessage = userMessage.split(/\s|　/);
 
 	const quizScoreRef = ref.child("user_scores");
 
@@ -340,30 +320,70 @@ const textEventHandler = async (
 			messages: [{ type: "text", text: json }],
 		});
 	} else if (userMessage === "天気") {
-		// try {
-		const forecast = await getWeatherForecast();
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{ type: "textV2", text: `【${forecast.targetArea}の天気予報】` },
-				{ type: "textV2", text: forecast.text },
-				{
-					type: "textV2",
-					text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
-				},
-			],
-		});
-		// } catch (error) {
-		// 	await client.replyMessage({
-		// 		replyToken: event.replyToken,
-		// 		messages: [
-		// 			{
-		// 				type: "textV2",
-		// 				text: "申し訳ありません。天気予報の取得に失敗しました。",
-		// 			},
-		// 		],
-		// 	});
-		// }
+		try {
+			const forecast = await getWeatherForecast(config.weather_zone);
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{ type: "textV2", text: `【${forecast.targetArea}の天気予報】` },
+					{ type: "textV2", text: forecast.text },
+					{
+						type: "textV2",
+						text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
+					},
+				],
+			});
+		} catch (error) {
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "textV2",
+						text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。",
+					},
+				],
+			});
+		}
+	} else if (splitMessage[0] === "天気ゾーン") {
+		if (splitMessage.length === 1) {
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "textV2",
+						text: "「天気ゾーン (ゾーン番号)」と入力することで天気ゾーンを設定できます。天気ゾーン一覧はこちら: https://x.gd/lhdUU",
+					},
+					{
+						type: "textV2",
+						text: `現在の天気ゾーン: ${config.weather_zone}`,
+					},
+				],
+			});
+		} else {
+			const zone = splitMessage[1];
+			if (/\d{6}/.test(zone)) {
+				await update(ref, { weather_zone: zone });
+				await client.replyMessage({
+					replyToken: event.replyToken,
+					messages: [
+						{
+							type: "textV2",
+							text: `天気ゾーンを${zone}に設定しました。`,
+						},
+					],
+				});
+			} else {
+				await client.replyMessage({
+					replyToken: event.replyToken,
+					messages: [
+						{
+							type: "textV2",
+							text: "天気ゾーンが正しく入力されていません。\n「天気ゾーン (ゾーン番号)」と入力してください。\nゾーン番号は6桁の半角数字です。",
+						},
+					],
+				});
+			}
+		}
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
 
