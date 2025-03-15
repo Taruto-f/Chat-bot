@@ -162,7 +162,7 @@ const textEventHandler = async (
 	const quizScoreRef = ref.child("user_scores");
 
 	if (userMessage === "判定") {
-		const result = Math.random() < 0.5 ? "Yes" : "No";
+		const result = Math.random() < 0.5 ? "Yes" : "";
 		await client.replyMessage({
 			replyToken: event.replyToken,
 			messages: [{ type: "textV2", text: result }],
