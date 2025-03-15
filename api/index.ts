@@ -626,42 +626,97 @@ const textEventHandler = async (
 				});
 			}
 		} else {
-			// クイズがアクティブでない場合は、クイックリプライを表示
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [{
-					type: "text",
-					text: "以下のボタンから機能を選択してください。",
-					quickReply: {
-						items: [
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "天気予報",
-									text: "天気"
+			// クイズがアクティブでない場合
+			if (userMessage === "挨拶" || userMessage === "あいさつ") {
+				await client.replyMessage({
+					replyToken: event.replyToken,
+					messages: [{
+						type: "text",
+						text: "以下のボタンから挨拶を選択してください。",
+						quickReply: {
+							items: [
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "ありがとう",
+										text: "ありがとう"
+									}
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "さようなら",
+										text: "さようなら"
+									}
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "おはよう",
+										text: "おはよう"
+									}
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "こんにちは",
+										text: "こんにちは"
+									}
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "こんばんは",
+										text: "こんばんは"
+									}
 								}
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "クイズ",
-									text: "クイズ"
+							]
+						}
+					}]
+				});
+			} else {
+				// クイズがアクティブでない場合は、機能のクイックリプライを表示
+				await client.replyMessage({
+					replyToken: event.replyToken,
+					messages: [{
+						type: "text",
+						text: "以下のボタンから機能を選択してください。",
+						quickReply: {
+							items: [
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "天気予報",
+										text: "天気"
+									}
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "クイズ",
+										text: "クイズ"
+									}
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "占い",
+										text: "占い"
+									}
 								}
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "占い",
-									text: "占い"
-								}
-							}
-						]
-					}
-				}]
-			});
+							]
+						}
+					}]
+				});
+			}
 		}
 	}
 };
