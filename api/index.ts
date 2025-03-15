@@ -261,10 +261,10 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [{ type: "textV2", text: "またね" }],
 		});
-	} else if (/おはようございます/.test(userMessage)) {
+	} else if (/おはよう/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: "おはようございます" }],
+			messages: [{ type: "textV2", text: "おはよう" }],
 		});
 	} else if (/こんにちは/.test(userMessage)) {
 		await client.replyMessage({
@@ -514,6 +514,58 @@ const textEventHandler = async (
 								type: "message",
 								label: "占い",
 								text: "占い"
+							}
+						}
+					]
+				}
+			}]
+		});
+	} else if (userMessage === "挨拶" || userMessage === "あいさつ") {
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [{
+				type: "text",
+				text: "以下のボタンから挨拶を選択してください。",
+				quickReply: {
+					items: [
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "ありがとう",
+								text: "ありがとう"
+							}
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "さようなら",
+								text: "さようなら"
+							}
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "おはよう",
+								text: "おはよう"
+							}
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "こんにちは",
+								text: "こんにちは"
+							}
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "こんばんは",
+								text: "こんばんは"
 							}
 						}
 					]
