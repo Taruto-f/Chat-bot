@@ -155,7 +155,9 @@ const textEventHandler = async (
 		config = await get(ref);
 	}
 
-	const splitMessage = userMessage.split(/\s|　/);
+	const splitMessage = userMessage
+		.split(/\s|　/)
+		.filter((val) => val.length > 0);
 
 	const quizScoreRef = ref.child("user_scores");
 
