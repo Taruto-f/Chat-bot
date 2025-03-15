@@ -383,6 +383,12 @@ const textEventHandler = async (
 				{ type: "textV2", text: `Q. ${nextQuestion.question}` },
 				{ type: "textV2", text: "答えを入力してください！" },
 			];
+			// スコアが未定義の場合は0で初期化
+			if (config.user_scores[userId] === undefined) {
+				await update(quizScoreRef, {
+					[userId]: 0,
+				});
+			}
 
 			if (userAnswer === currentQuestion.answer) {
 				await update(quizScoreRef, {
