@@ -364,16 +364,34 @@ const textEventHandler = async (
 		} else {
 			const zone = splitMessage[1];
 			if (/\d{6}/.test(zone)) {
-				await update(ref, { weather_zone: zone });
-				await client.replyMessage({
-					replyToken: event.replyToken,
-					messages: [
-						{
-							type: "textV2",
-							text: `天気ゾーンを${zone}に設定しました。`,
-						},
-					],
-				});
+				try {
+					const weather = await getWeatherForecast(zone);
+
+					await update(ref, { weather_zone: zone });
+					await client.replyMessage({
+						replyToken: event.replyToken,
+						messages: [
+							{
+								type: "textV2",
+								text: `天気ゾーンを${zone}に設定しました。`,
+							},
+							{
+								type: "textV2",
+								text: `地域: ${weather.targetArea}\n発表者: ${weather.publishingOffice}`,
+							},
+						],
+					});
+				} catch (error) {
+					await client.replyMessage({
+						replyToken: event.replyToken,
+						messages: [
+							{
+								type: "textV2",
+								text: "天気ゾーンが正しく入力されていません。\n「天気ゾーン (ゾーン番号)」と入力してください。\nゾーン番号は6桁の半角数字です。",
+							},
+						],
+					});
+				}
 			} else {
 				await client.replyMessage({
 					replyToken: event.replyToken,
