@@ -404,6 +404,15 @@ const textEventHandler = async (
 				});
 			}
 		}
+	} else if (userMessage === "漢字") {
+		// ランダムな漢字をいう
+		const kanji = String.fromCharCode(
+			0x4e00 + Math.floor(Math.random() * (0x9faf - 0x4e00 + 1)),
+		);
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [{ type: "textV2", text: kanji }],
+		});
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
 
