@@ -299,12 +299,10 @@ const textEventHandler = async (
 		const userId = event.source?.userId || "anonymous";
 		await update(ref, { quiz_status: true });
 
-		// スコアが未定義の場合は0で初期化
-		if (config.user_scores[userId] === undefined) {
-			await update(quizScoreRef, {
-				[userId]: 0,
-			});
-		}
+		// クイズ開始時にスコアを0にリセット
+		await update(quizScoreRef, {
+			[userId]: 0,
+		});
 
 		// 最初の問題を表示
 		const firstQuestionId = getNextQuestion();
@@ -318,7 +316,7 @@ const textEventHandler = async (
 			messages: [
 				{
 					type: "textV2",
-					text: `現在のスコア: ${config.user_scores[userId]}点`,
+					text: "クイズを開始します！スコアは0点にリセットされました。"
 				},
 				{ type: "textV2", text: firstQuestion.question },
 				{ type: "textV2", text: "答えを入力してください！" },
