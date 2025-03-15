@@ -349,11 +349,7 @@ const textEventHandler = async (
 				{ type: "textV2", text: forecast.text },
 				{
 					type: "textV2",
-					text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP")}`,
-				},
-				{
-					type: "textV2",
-					text: `発表者: ${forecast.publishingOffice}`,
+					text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
 				},
 			],
 		});
