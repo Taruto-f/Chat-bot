@@ -48,85 +48,165 @@ const app: Application = express();
 // クイズの問題リストを定数として定義
 const QUIZ_QUESTIONS = [
 	{
-		question: "日本の首都は？",
+		question: "古代メソポタミア文明で最初に作られた文字は何ですか？",
+		answer: "楔形文字",
+	},
+	{
+		question: "古代エジプト文明のナイル川流域で栽培された主な作物は何ですか？",
+		answer: "小麦",
+	},
+	{
+		question: "インダス文明の代表的な都市遺跡の1つは何ですか？",
+		answer: "モヘンジョダロ",
+	},
+	{
+		question: "中国の黄河文明で生まれた最古の王朝は何ですか？",
+		answer: "殷",
+	},
+	{
+		question: "日本の気候は何気候に属していますか？",
+		answer: "温帯",
+	},
+	{
+		question: "世界の三大宗教とは、キリスト教、イスラム教、そしてもう1つは何ですか？",
+		answer: "仏教",
+	},
+	{
+		question: "アフリカ大陸を南北に走る大地溝帯の名前は何ですか？",
+		answer: "グレートリフトバレー",
+	},
+	{
+		question: "縄文時代の主な生活様式は何ですか？",
+		answer: "狩猟採集",
+	},
+	{
+		question: "弥生時代に伝来した最も重要な技術は何ですか？",
+		answer: "稲作",
+	},
+	{
+		question: "古墳時代の代表的な前方後円墳である仁徳天皇陵古墳がある都道府県はどこですか？",
+		answer: "大阪府",
+	},
+	{
+		question: "飛鳥時代に制定された日本最古の成文法典は何ですか？",
+		answer: "大宝律令",
+	},
+	{
+		question: "奈良時代に編纂された日本最古の歴史書は何ですか？",
+		answer: "古事記",
+	},
+	{
+		question: "世界の三大穀物は、米、小麦、そしてもう1つは何ですか？",
+		answer: "とうもろこし",
+	},
+	{
+		question: "日本の四大工業地帯の1つで、京浜工業地帯がある関東地方の2つの都県は何ですか？",
+		answer: "東京都と神奈川県",
+	},
+	{
+		question: "世界最大の熱帯雨林はどこにありますか？",
+		answer: "アマゾン",
+	},
+	{
+		question: "モンスーンの影響を強く受ける地域として知られるアジアの半島は何ですか？",
+		answer: "インド半島",
+	},
+	{
+		question: "日本の人口が最も集中している三大都市圏の中心となる都市を答えてください。",
 		answer: "東京",
 	},
 	{
-		question: "1+1は？",
-		answer: "2",
+		question: "聖徳太子が制定した日本最古の憲法は何ですか？",
+		answer: "十七条憲法",
 	},
 	{
-		question: "世界で一番大きな大陸は？",
-		answer: "ユーラシア",
+		question: "平安時代に編纂された最初の仮名文学は何ですか？",
+		answer: "土佐日記",
 	},
 	{
-		question: "太陽系で一番大きな惑星は？",
-		answer: "木星",
+		question: "世界で最も標高の高い大陸は何ですか？",
+		answer: "南極大陸",
 	},
 	{
-		question: "日本の国鳥は？",
-		answer: "キジ",
+		question: "古代ギリシャの都市国家を何と呼びましたか？",
+		answer: "ポリス",
 	},
 	{
-		question: "世界で一番長い川は？",
-		answer: "ナイル川",
+		question: "古代ローマ帝国の最盛期の皇帝は誰ですか？",
+		answer: "トラヤヌス",
 	},
 	{
-		question: "日本の国花は？",
-		answer: "桜",
+		question: "シルクロードの東の起点となった中国の都は何ですか？",
+		answer: "長安",
 	},
 	{
-		question: "世界で一番高い山は？",
-		answer: "エベレスト",
+		question: "奈良時代に建立された大仏がある寺院は何ですか？",
+		answer: "東大寺",
 	},
 	{
-		question: "日本の国魚は？",
-		answer: "錦鯉",
+		question: "平安時代に完成した、日本で最古の漢字辞典は何ですか？",
+		answer: "新撰字鏡",
 	},
 	{
-		question: "世界で一番大きな海は？",
-		answer: "太平洋",
-	},
-	{
-		question: "南アフリカにある世界遺産は？",
-		answer: "ロック岩",
-	},
-	{
-		question: "世界で一番大きな湖は？",
-		answer: "バイカル湖",
-	},
-	{
-		question: "世界で一番大きな火山は？",
-		answer: "マウント・エベレスト",
-	},
-	{
-		question: "世界で一番大きな砂漠は？",
+		question: "世界最大の砂漠はどこにありますか？",
 		answer: "サハラ砂漠",
 	},
 	{
-		question: "日本の国歌は？",
-		answer: "君が代",
+		question: "日本で最も古い神社とされるのは何ですか？",
+		answer: "大神神社",
 	},
 	{
-		question: "世界で一番大きな国は？",
-		answer: "ロシア",
+		question: "世界三大河川の1つで、エジプト文明を育んだ川は何ですか？",
+		answer: "ナイル川",
 	},
 	{
-		question: "日本の国技は？",
-		answer: "相撲",
+		question: "縄文時代を代表する土器の模様は何ですか？",
+		answer: "縄目模様",
 	},
 	{
-		question: "世界で一番人口の多い国は？",
-		answer: "中国",
+		question: "古代中国の四大発明の1つで、紙の発明者とされる人物は誰ですか？",
+		answer: "蔡倫",
 	},
 	{
-		question: "日本の国石は？",
-		answer: "翡翠",
+		question: "日本の気候を特徴づける梅雨は何によってもたらされますか？",
+		answer: "梅雨前線",
 	},
 	{
-		question: "世界で一番大きな島は？",
-		answer: "グリーンランド",
+		question: "世界最大のサンゴ礁は何ですか？",
+		answer: "グレートバリアリーフ",
 	},
+	{
+		question: "飛鳥時代に建立された法隆寺は何県にありますか？",
+		answer: "奈良県",
+	},
+	{
+		question: "古代エジプトのピラミッドが最も多く建設された王朝は何ですか？",
+		answer: "古王国時代",
+	},
+	{
+		question: "日本の地形を形作る4つのプレートの1つ、太平洋プレートが接する海溝は何ですか？",
+		answer: "日本海溝",
+	},
+	{
+		question: "古代ローマで作られた円形闘技場の代表的な建造物は何ですか？",
+		answer: "コロッセウム",
+	},
+	{
+		question: "奈良時代に編纂された日本最古の地理書は何ですか？",
+		answer: "風土記",
+	},
+	{
+		question: "世界で最も人口密度が高い大陸はどこですか？",
+		answer: "アジア",
+	},
+	{
+		question: "日本の水田農業が本格的に始まったのは何時代からですか？",
+		answer: "弥生時代",
+	},
+	{
+		question: "世界遺産に登録されている富士山の標高は何メートルですか？",
+		answer: "3776",
+	}
 ];
 
 // 次の問題を取得する関数
@@ -162,7 +242,7 @@ const textEventHandler = async (
 	const quizScoreRef = ref.child("user_scores");
 
 	if (userMessage === "判定") {
-		const result = Math.random() < 0.5 ? "Yes" : "";
+		const result = Math.random() < 0.5 ? "Yes" : "No";
 		await client.replyMessage({
 			replyToken: event.replyToken,
 			messages: [{ type: "textV2", text: result }],
