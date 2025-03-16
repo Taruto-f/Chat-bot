@@ -513,6 +513,14 @@ const textEventHandler = async (
 								label: "占い",
 								text: "占い"
 							}
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "挨拶",
+								text: "挨拶"
+							}
 						}
 					]
 				}
@@ -677,8 +685,7 @@ const textEventHandler = async (
 						}
 					}]
 				});
-			} else {
-				// クイズがアクティブでない場合は、機能のクイックリプライを表示
+			} else if (userMessage === "機能") {
 				await client.replyMessage({
 					replyToken: event.replyToken,
 					messages: [{
@@ -708,6 +715,14 @@ const textEventHandler = async (
 										type: "message",
 										label: "占い",
 										text: "占い"
+									}
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "挨拶",
+										text: "挨拶"
 									}
 								}
 							]
