@@ -40,7 +40,7 @@ const PORT = process.env.PORT ?? 3000;
 // const { GoogleGenerativeAI } = require("@google/generative-ai");
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API ?? "");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 // LINE SDK クライアントの作成
 const client = new messagingApi.MessagingApiClient(clientConfig);
