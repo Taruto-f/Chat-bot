@@ -640,6 +640,14 @@ const textEventHandler = async (
 									text: "こんばんは",
 								},
 							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "おやすみ",
+									text: "おやすみ",
+								},
+							},
 						],
 					},
 				},
