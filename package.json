@@ -8,6 +8,7 @@
 		"typescript": "^5.0.0"
 	},
 	"dependencies": {
+		"@google/generative-ai": "^0.24.0",
 		"@line/bot-sdk": "^9.7.1",
 		"@types/express": "^5.0.0",
 		"axios": "^1.8.3",

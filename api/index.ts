@@ -36,6 +36,12 @@ admin.initializeApp({
 
 const PORT = process.env.PORT ?? 3000;
 
+//gemini
+// const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API ?? "");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
 // LINE SDK クライアントの作成
 const client = new messagingApi.MessagingApiClient(clientConfig);
 
@@ -521,11 +527,50 @@ const textEventHandler = async (
 								label: "挨拶",
 								text: "挨拶"
 							}
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "質問",
+								text: "質問"
+							}
 						}
 					]
 				}
 			}]
 		});
+	} else if (userMessage === "質問") {
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [{
+				type: "text",
+				text: "質問を入力してください。AIが回答します。"
+			}]
+		});
+	} else if (userMessage.startsWith("?") || userMessage.startsWith("？")) {
+		try {
+			const question = userMessage.slice(1).trim();
+			const result = await model.generateContent(question);
+			const response = await result.response;
+			const text = response.text();
+			
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [{
+					type: "text",
+					text: text
+				}]
+			});
+		} catch (error) {
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [{
+					type: "text",
+					text: "申し訳ありません。回答の生成に失敗しました。"
+				}]
+			});
+		}
 	} else if (userMessage === "挨拶" || userMessage === "あいさつ") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
@@ -723,6 +768,14 @@ const textEventHandler = async (
 										type: "message",
 										label: "挨拶",
 										text: "挨拶"
+									}
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "質問",
+										text: "質問"
 									}
 								}
 							]
