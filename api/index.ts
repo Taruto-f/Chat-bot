@@ -73,7 +73,8 @@ const QUIZ_QUESTIONS = [
 		answer: "温帯",
 	},
 	{
-		question: "世界の三大宗教とは、キリスト教、イスラム教、そしてもう1つは何ですか？",
+		question:
+			"世界の三大宗教とは、キリスト教、イスラム教、そしてもう1つは何ですか？",
 		answer: "仏教",
 	},
 	{
@@ -89,7 +90,8 @@ const QUIZ_QUESTIONS = [
 		answer: "稲作",
 	},
 	{
-		question: "古墳時代の代表的な前方後円墳である仁徳天皇陵古墳がある都道府県はどこですか？",
+		question:
+			"古墳時代の代表的な前方後円墳である仁徳天皇陵古墳がある都道府県はどこですか？",
 		answer: "大阪府",
 	},
 	{
@@ -105,7 +107,8 @@ const QUIZ_QUESTIONS = [
 		answer: "とうもろこし",
 	},
 	{
-		question: "日本の四大工業地帯の1つで、京浜工業地帯がある関東地方の2つの都県は何ですか？",
+		question:
+			"日本の四大工業地帯の1つで、京浜工業地帯がある関東地方の2つの都県は何ですか？",
 		answer: "東京都と神奈川県",
 	},
 	{
@@ -113,11 +116,13 @@ const QUIZ_QUESTIONS = [
 		answer: "アマゾン",
 	},
 	{
-		question: "モンスーンの影響を強く受ける地域として知られるアジアの半島は何ですか？",
+		question:
+			"モンスーンの影響を強く受ける地域として知られるアジアの半島は何ですか？",
 		answer: "インド半島",
 	},
 	{
-		question: "日本の人口が最も集中している三大都市圏の中心となる都市を答えてください。",
+		question:
+			"日本の人口が最も集中している三大都市圏の中心となる都市を答えてください。",
 		answer: "東京",
 	},
 	{
@@ -189,7 +194,8 @@ const QUIZ_QUESTIONS = [
 		answer: "古王国時代",
 	},
 	{
-		question: "日本の地形を形作る4つのプレートの1つ、太平洋プレートが接する海溝は何ですか？",
+		question:
+			"日本の地形を形作る4つのプレートの1つ、太平洋プレートが接する海溝は何ですか？",
 		answer: "日本海溝",
 	},
 	{
@@ -211,7 +217,7 @@ const QUIZ_QUESTIONS = [
 	{
 		question: "世界遺産に登録されている富士山の標高は何メートルですか？",
 		answer: "3776",
-	}
+	},
 ];
 
 // 次の問題を取得する関数
@@ -322,7 +328,7 @@ const textEventHandler = async (
 			messages: [
 				{
 					type: "textV2",
-					text: "クイズを開始します！スコアは0点にリセットされました。"
+					text: "クイズを開始します！スコアは0点にリセットされました。",
 				},
 				{ type: "textV2", text: firstQuestion.question },
 				{ type: "textV2", text: "答えを入力してください！" },
@@ -491,137 +497,147 @@ const textEventHandler = async (
 	} else if (userMessage === "機能") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{
-				type: "text",
-				text: "以下のボタンから機能を選択してください。",
-				quickReply: {
-					items: [
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "天気予報",
-								text: "天気"
-							}
-						},
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "クイズ",
-								text: "クイズ"
-							}
-						},
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "占い",
-								text: "占い"
-							}
-						},
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "挨拶",
-								text: "挨拶"
-							}
-						},
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "質問",
-								text: "質問"
-							}
-						}
-					]
-				}
-			}]
+			messages: [
+				{
+					type: "text",
+					text: "以下のボタンから機能を選択してください。",
+					quickReply: {
+						items: [
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "天気予報",
+									text: "天気",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "クイズ",
+									text: "クイズ",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "占い",
+									text: "占い",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "挨拶",
+									text: "挨拶",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "質問",
+									text: "質問",
+								},
+							},
+						],
+					},
+				},
+			],
 		});
 	} else if (userMessage === "質問") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{
-				type: "text",
-				text: "質問を入力してください。AIが回答します。"
-			}]
+			messages: [
+				{
+					type: "text",
+					text: "質問を入力してください。AIが回答します。",
+				},
+			],
 		});
-	} else if (userMessage.startsWith("?") || userMessage.startsWith("？")) {
+	} else if (userMessage.endsWith("?") || userMessage.endsWith("？")) {
 		try {
-			const question = userMessage.slice(1).trim();
+			const question = userMessage;
 			const result = await model.generateContent(question);
 			const response = await result.response;
 			const text = response.text();
-			
+
 			await client.replyMessage({
 				replyToken: event.replyToken,
-				messages: [{
-					type: "text",
-					text: text
-				}]
+				messages: [
+					{
+						type: "text",
+						text: text,
+					},
+				],
 			});
 		} catch (error) {
 			await client.replyMessage({
 				replyToken: event.replyToken,
-				messages: [{
-					type: "text",
-					text: "申し訳ありません。回答の生成に失敗しました。"
-				}]
+				messages: [
+					{
+						type: "text",
+						text: "申し訳ありません。回答の生成に失敗しました。",
+					},
+				],
 			});
 		}
 	} else if (userMessage === "挨拶" || userMessage === "あいさつ") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{
-				type: "text",
-				text: "以下のボタンから挨拶を選択してください。",
-				quickReply: {
-					items: [
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "ありがとう",
-								text: "ありがとう"
-							}
-						},
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "さようなら",
-								text: "さようなら"
-							}
-						},
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "おはよう",
-								text: "おはよう"
-							}
-						},
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "こんにちは",
-								text: "こんにちは"
-							}
-						},
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "こんばんは",
-								text: "こんばんは"
-							}
-						}
-					]
-				}
-			}]
+			messages: [
+				{
+					type: "text",
+					text: "以下のボタンから挨拶を選択してください。",
+					quickReply: {
+						items: [
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "ありがとう",
+									text: "ありがとう",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "さようなら",
+									text: "さようなら",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "おはよう",
+									text: "おはよう",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "こんにちは",
+									text: "こんにちは",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "こんばんは",
+									text: "こんばんは",
+								},
+							},
+						],
+					},
+				},
+			],
 		});
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
@@ -681,106 +697,110 @@ const textEventHandler = async (
 			if (userMessage === "挨拶" || userMessage === "あいさつ") {
 				await client.replyMessage({
 					replyToken: event.replyToken,
-					messages: [{
-						type: "text",
-						text: "以下のボタンから挨拶を選択してください。",
-						quickReply: {
-							items: [
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "ありがとう",
-										text: "ありがとう"
-									}
-								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "さようなら",
-										text: "さようなら"
-									}
-								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "おはよう",
-										text: "おはよう"
-									}
-								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "こんにちは",
-										text: "こんにちは"
-									}
-								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "こんばんは",
-										text: "こんばんは"
-									}
-								}
-							]
-						}
-					}]
+					messages: [
+						{
+							type: "text",
+							text: "以下のボタンから挨拶を選択してください。",
+							quickReply: {
+								items: [
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "ありがとう",
+											text: "ありがとう",
+										},
+									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "さようなら",
+											text: "さようなら",
+										},
+									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "おはよう",
+											text: "おはよう",
+										},
+									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "こんにちは",
+											text: "こんにちは",
+										},
+									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "こんばんは",
+											text: "こんばんは",
+										},
+									},
+								],
+							},
+						},
+					],
 				});
 			} else if (userMessage === "機能") {
 				await client.replyMessage({
 					replyToken: event.replyToken,
-					messages: [{
-						type: "text",
-						text: "以下のボタンから機能を選択してください。",
-						quickReply: {
-							items: [
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "天気予報",
-										text: "天気"
-									}
-								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "クイズ",
-										text: "クイズ"
-									}
-								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "占い",
-										text: "占い"
-									}
-								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "挨拶",
-										text: "挨拶"
-									}
-								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "質問",
-										text: "質問"
-									}
-								}
-							]
-						}
-					}]
+					messages: [
+						{
+							type: "text",
+							text: "以下のボタンから機能を選択してください。",
+							quickReply: {
+								items: [
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "天気予報",
+											text: "天気",
+										},
+									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "クイズ",
+											text: "クイズ",
+										},
+									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "占い",
+											text: "占い",
+										},
+									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "挨拶",
+											text: "挨拶",
+										},
+									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "質問",
+											text: "質問",
+										},
+									},
+								],
+							},
+						},
+					],
 				});
 			}
 		}
