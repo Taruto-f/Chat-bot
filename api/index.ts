@@ -565,6 +565,12 @@ const textEventHandler = async (
 			const response = await result.response;
 			const text = response.text();
 
+			if (event.source?.type === "user") {
+				await client.showLoadingAnimation({
+					chatId: event.source.userId ?? "",
+				});
+			}
+
 			await client.replyMessage({
 				replyToken: event.replyToken,
 				messages: [
