@@ -494,8 +494,8 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [{ type: "textV2", text: kanji }],
 		});
-	} else if (userMessage === "やることリスト") {
-		if (config.todo_list.length === 0) {
+	} else if (userMessage === "やることリスト" || userMessage === "やることリストを表示") {
+		if (!config.todo_list || config.todo_list.length === 0) {
 			await client.replyMessage({
 				replyToken: event.replyToken,
 				messages: [
