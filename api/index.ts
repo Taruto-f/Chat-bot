@@ -762,7 +762,7 @@ const textEventHandler = async (
 								action: {
 									type: "message",
 									label: "やることリスト",
-									text: "やることリスト",
+									text: "やることリストを表示",
 								},
 							},
 						],
