@@ -494,13 +494,19 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [{ type: "textV2", text: kanji }],
 		});
-	} else if (userMessage === "機能") {
+	} else if (userMessage === "機能一覧") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
 			messages: [
 				{
 					type: "text",
-					text: "以下のボタンから機能を選択してください。",
+					text: "以下の機能が利用できます：\n\n" +
+						"1. 天気予報\n" +
+						"2. クイズ\n" +
+						"3. 占い\n" +
+						"4. 挨拶\n" +
+						"5. AI質問\n\n" +
+						"各機能を使用するには、以下のボタンから選択してください。",
 					quickReply: {
 						items: [
 							{
