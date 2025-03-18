@@ -606,8 +606,9 @@ const textEventHandler = async (
 				],
 			});
 		} else {
+			const todoList = config.todo_list || [];
 			await update(ref, {
-				todo_list: [...config.todo_list, newTask],
+				todo_list: [...todoList, newTask],
 			});
 			await client.replyMessage({
 				replyToken: event.replyToken,
