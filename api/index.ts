@@ -494,6 +494,165 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [{ type: "textV2", text: kanji }],
 		});
+	} else if (userMessage === "やることリスト") {
+		if (config.todo_list.length === 0) {
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: "やることリストは空です。\n「追加: タスク」の形式で新しいタスクを追加できます。",
+						quickReply: {
+							items: [
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "タスクを追加",
+										text: "追加: 新しいタスク",
+									},
+								},
+							],
+						},
+					},
+				],
+			});
+		} else {
+			const todoList = config.todo_list
+				.map((todo, index) => `${index + 1}. ${todo}`)
+				.join("\n");
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: `【やることリスト】\n${todoList}\n\n「削除: 番号」の形式でタスクを削除できます。`,
+						quickReply: {
+							items: [
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "タスクを追加",
+										text: "追加: 新しいタスク",
+									},
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "リストをクリア",
+										text: "クリア",
+									},
+								},
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: config.reminder_enabled ? "リマインダーをオフ" : "リマインダーをオン",
+										text: config.reminder_enabled ? "リマインダーオフ" : "リマインダーオン",
+									},
+								},
+							],
+						},
+					},
+				],
+			});
+		}
+	} else if (userMessage === "リマインダーオン") {
+		await update(ref, {
+			reminder_enabled: true,
+			last_reminder: Date.now(),
+		});
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [
+				{
+					type: "text",
+					text: "2時間おきのリマインダーをオンにしました。\nやることリストの内容を定期的に通知します。",
+				},
+			],
+		});
+	} else if (userMessage === "リマインダーオフ") {
+		await update(ref, {
+			reminder_enabled: false,
+		});
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [
+				{
+					type: "text",
+					text: "リマインダーをオフにしました。",
+				},
+			],
+		});
+	} else if (userMessage.startsWith("追加: ")) {
+		const newTask = userMessage.slice(3);
+		if (newTask.trim() === "") {
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: "タスクの内容を入力してください。\n例: 追加: 買い物に行く",
+					},
+				],
+			});
+		} else {
+			await update(ref, {
+				todo_list: [...config.todo_list, newTask],
+			});
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: `タスク「${newTask}」を追加しました。`,
+					},
+				],
+			});
+		}
+	} else if (userMessage.startsWith("削除: ")) {
+		const taskNumber = parseInt(userMessage.slice(3));
+		if (isNaN(taskNumber) || taskNumber < 1 || taskNumber > config.todo_list.length) {
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: "正しいタスク番号を入力してください。\n例: 削除: 1",
+					},
+				],
+			});
+		} else {
+			const deletedTask = config.todo_list[taskNumber - 1];
+			const newTodoList = config.todo_list.filter((_, index) => index !== taskNumber - 1);
+			await update(ref, {
+				todo_list: newTodoList,
+			});
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: `タスク「${deletedTask}」を削除しました。`,
+					},
+				],
+			});
+		}
+	} else if (userMessage === "クリア") {
+		await update(ref, {
+			todo_list: [],
+		});
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [
+				{
+					type: "text",
+					text: "やることリストをクリアしました。",
+				},
+			],
+		});
 	} else if (userMessage === "機能一覧") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
@@ -505,7 +664,8 @@ const textEventHandler = async (
 						"2. クイズ\n" +
 						"3. 占い\n" +
 						"4. 挨拶\n" +
-						"5. AI質問\n\n" +
+						"5. AI質問\n" +
+						"6. やることリスト\n\n" +
 						"各機能を使用するには、以下のボタンから選択してください。",
 					quickReply: {
 						items: [
@@ -547,6 +707,14 @@ const textEventHandler = async (
 									type: "message",
 									label: "質問",
 									text: "質問",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "やることリスト",
+									text: "やることリスト",
 								},
 							},
 						],
@@ -881,3 +1049,48 @@ app.post(
 app.listen(PORT, () => {
 	console.log(`Application is live and listening on port ${PORT}`);
 });
+
+// リマインダーをチェックする関数
+async function checkReminders() {
+	const ref = db.ref("data");
+	const snapshot = await ref.once("value");
+	const data = snapshot.val();
+
+	if (!data) return;
+
+	Object.entries(data).forEach(async ([key, value]: [string, any]) => {
+		if (value.reminder_enabled && value.todo_list && value.todo_list.length > 0) {
+			const now = Date.now();
+			const lastReminder = value.last_reminder || 0;
+			const twoHours = 2 * 60 * 60 * 1000; // 2時間をミリ秒で表現
+
+			if (now - lastReminder >= twoHours) {
+				const todoList = value.todo_list
+					.map((todo: string, index: number) => `${index + 1}. ${todo}`)
+					.join("\n");
+
+				try {
+					await client.pushMessage({
+						to: key,
+						messages: [
+							{
+								type: "text",
+								text: `【やることリストのリマインダー】\n\n${todoList}`,
+							},
+						],
+					});
+
+					// 最後のリマインダー時間を更新
+					await ref.child(key).update({
+						last_reminder: now,
+					});
+				} catch (error) {
+					console.error(`Failed to send reminder to ${key}:`, error);
+				}
+			}
+		}
+	});
+}
+
+// 1分ごとにリマインダーをチェック
+setInterval(checkReminders, 60 * 1000);

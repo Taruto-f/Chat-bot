@@ -3,6 +3,9 @@ export interface Config {
 	user_scores: Record<string, number>; // ユーザーのスコア
 	current_question: number; // 現在の問題番号
 	weather_zone: string; // 天気予報の地域
+	todo_list: string[]; // やることリスト
+	reminder_enabled: boolean; // リマインダーが有効か
+	last_reminder: number; // 最後にリマインダーを送った時間
 }
 
 export const defaultConfig: Config = {
@@ -12,4 +15,7 @@ export const defaultConfig: Config = {
 	},
 	current_question: 0,
 	weather_zone: "130000", // 東京
+	todo_list: [], // やることリスト
+	reminder_enabled: false, // リマインダーはデフォルトで無効
+	last_reminder: 0, // 最後にリマインダーを送った時間
 };
