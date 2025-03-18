@@ -495,7 +495,8 @@ const textEventHandler = async (
 			messages: [{ type: "textV2", text: kanji }],
 		});
 	} else if (userMessage === "やることリスト" || userMessage === "やることリストを表示") {
-		if (!config.todo_list || config.todo_list.length === 0) {
+		const todoList = config.todo_list || [];
+		if (todoList.length === 0) {
 			await client.replyMessage({
 				replyToken: event.replyToken,
 				messages: [
@@ -518,7 +519,7 @@ const textEventHandler = async (
 				],
 			});
 		} else {
-			const todoList = config.todo_list
+			const todoListText = todoList
 				.map((todo, index) => `${index + 1}. ${todo}`)
 				.join("\n");
 			await client.replyMessage({
@@ -526,7 +527,7 @@ const textEventHandler = async (
 				messages: [
 					{
 						type: "text",
-						text: `【やることリスト】\n${todoList}\n\n「削除: 番号」の形式でタスクを削除できます。`,
+						text: `【やることリスト】\n${todoListText}\n\n「削除: 番号」の形式でタスクを削除できます。`,
 						quickReply: {
 							items: [
 								{
