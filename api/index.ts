@@ -559,6 +559,78 @@ const textEventHandler = async (
 				],
 			});
 		}
+	} else if (userMessage === "追加: 新しいタスク") {
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [
+				{
+					type: "text",
+					text: "追加したいタスクの内容を入力してください。\n例: 追加: 買い物に行く",
+					quickReply: {
+						items: [
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "やることリストを表示",
+									text: "やることリスト",
+								},
+							},
+						],
+					},
+				},
+			],
+		});
+	} else if (userMessage.startsWith("追加: ")) {
+		const newTask = userMessage.slice(3);
+		if (newTask.trim() === "") {
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: "タスクの内容を入力してください。\n例: 追加: 買い物に行く",
+						quickReply: {
+							items: [
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "やることリストを表示",
+										text: "やることリスト",
+									},
+								},
+							],
+						},
+					},
+				],
+			});
+		} else {
+			await update(ref, {
+				todo_list: [...config.todo_list, newTask],
+			});
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: `タスク「${newTask}」を追加しました。`,
+						quickReply: {
+							items: [
+								{
+									type: "action",
+									action: {
+										type: "message",
+										label: "やることリストを表示",
+										text: "やることリスト",
+									},
+								},
+							],
+						},
+					},
+				],
+			});
+		}
 	} else if (userMessage === "リマインダーオン") {
 		await update(ref, {
 			reminder_enabled: true,
@@ -586,32 +658,6 @@ const textEventHandler = async (
 				},
 			],
 		});
-	} else if (userMessage.startsWith("追加: ")) {
-		const newTask = userMessage.slice(3);
-		if (newTask.trim() === "") {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "タスクの内容を入力してください。\n例: 追加: 買い物に行く",
-					},
-				],
-			});
-		} else {
-			await update(ref, {
-				todo_list: [...config.todo_list, newTask],
-			});
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: `タスク「${newTask}」を追加しました。`,
-					},
-				],
-			});
-		}
 	} else if (userMessage.startsWith("削除: ")) {
 		const taskNumber = parseInt(userMessage.slice(3));
 		if (isNaN(taskNumber) || taskNumber < 1 || taskNumber > config.todo_list.length) {
