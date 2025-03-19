@@ -448,7 +448,6 @@ const textEventHandler = async (
 			if (/\d{6}/.test(zone)) {
 				try {
 					const weather = await getWeatherForecast(zone);
-
 					await update(ref, { weather_zone: zone });
 					await client.replyMessage({
 						replyToken: event.replyToken,
