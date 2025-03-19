@@ -248,19 +248,6 @@ type MessageType = {
 	};
 };
 
-// メッセージ送信関数を定義
-async function sendMessage(replyToken: string, messages: MessageType[]) {
-	await client.replyMessage({
-		replyToken,
-		messages: messages.map((msg) => ({
-			type: "text",
-			text: msg.text,
-			emojis: msg.emojis,
-			quickReply: msg.quickReply,
-		})),
-	});
-}
-
 // ✅ LINE Bot のメッセージ処理
 const textEventHandler = async (
 	event: webhook.Event,
@@ -280,6 +267,23 @@ const textEventHandler = async (
 	async function update(db: Reference, new_config: Partial<Config>) {
 		await db.update(new_config);
 		config = await get(ref);
+	}
+
+	// メッセージ送信関数を定義
+	async function sendMessage(replyToken: string, messages: MessageType[]) {
+		await client.replyMessage({
+			replyToken,
+			messages: messages.map((msg) => ({
+				type: "text",
+				text: msg.text,
+				emojis: msg.emojis,
+				quickReply: msg.quickReply,
+				sender: {
+					name: "test",
+				},
+			})),
+			notificationDisabled: config.is_silent,
+		});
 	}
 
 	const splitMessage = userMessage
@@ -452,6 +456,16 @@ const textEventHandler = async (
 				}
 			}
 		}
+	} else if (userMessage === "通知オン") {
+		await update(ref, { is_silent: false });
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "通知を有効にしました。" },
+		]);
+	} else if (userMessage === "通知オフ") {
+		await update(ref, { is_silent: true });
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "通知を無効にしました。" },
+		]);
 	} else if (userMessage === "機能一覧") {
 		await sendMessage(event.replyToken, [
 			{
@@ -652,7 +666,16 @@ const textEventHandler = async (
 	} else if (userMessage === "6" || userMessage === "地震") {
 		try {
 			const earthquakeData = await getEarthquakeInfo();
-			const message = `【最新の地震情報】\n\n${earthquakeData.time}\n震源地: ${earthquakeData.location}\n震度: ${earthquakeData.intensity}\n深さ: ${earthquakeData.depth}km\nマグニチュード: ${earthquakeData.magnitude}`;
+			const message = `【最新の地震情報】
+			\n
+			=========================
+			発生時刻: ${earthquakeData.time}
+			震源地: ${earthquakeData.location}
+			最大震度: ${earthquakeData.intensity}
+			深さ: ${earthquakeData.depth}km
+			マグニチュード: ${earthquakeData.magnitude}
+			=========================
+			`;
 			await sendMessage(event.replyToken, [{ type: "text", text: message }]);
 		} catch (error) {
 			await sendMessage(event.replyToken, [
@@ -713,13 +736,19 @@ const textEventHandler = async (
 		}
 	} else if (userMessage === "やることリスト追加") {
 		await sendMessage(event.replyToken, [
-			{ type: "text", text: "追加するタスクを入力してください。\n例：やることリスト追加 買い物に行く" },
+			{
+				type: "text",
+				text: "追加するタスクを入力してください。\n例：やることリスト追加 買い物に行く",
+			},
 		]);
 	} else if (userMessage.startsWith("やることリスト追加 ")) {
 		const newTask = userMessage.replace("やることリスト追加 ", "").trim();
 		if (newTask === "") {
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: "タスクの内容を入力してください。\n例：やることリスト追加 買い物に行く" },
+				{
+					type: "text",
+					text: "タスクの内容を入力してください。\n例：やることリスト追加 買い物に行く",
+				},
 			]);
 		} else {
 			const updatedList = [...(config.todo_list || []), newTask];
@@ -738,18 +767,29 @@ const textEventHandler = async (
 				.map((todo, index) => `${index + 1}. ${todo}`)
 				.join("\n");
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: `削除するタスクの番号を入力してください。\n\n【やることリスト】\n${todoList}` },
+				{
+					type: "text",
+					text: `削除するタスクの番号を入力してください。\n\n【やることリスト】\n${todoList}`,
+				},
 			]);
 		}
 	} else if (userMessage.startsWith("やることリスト削除 ")) {
-		const taskNumber = parseInt(userMessage.replace("やることリスト削除 ", "").trim());
-		if (isNaN(taskNumber) || taskNumber < 1 || taskNumber > config.todo_list.length) {
+		const taskNumber = Number.parseInt(
+			userMessage.replace("やることリスト削除 ", "").trim(),
+		);
+		if (
+			Number.isNaN(taskNumber) ||
+			taskNumber < 1 ||
+			taskNumber > config.todo_list.length
+		) {
 			await sendMessage(event.replyToken, [
 				{ type: "text", text: "正しいタスク番号を入力してください。" },
 			]);
 		} else {
 			const deletedTask = config.todo_list[taskNumber - 1];
-			const updatedList = config.todo_list.filter((_, index) => index !== taskNumber - 1);
+			const updatedList = config.todo_list.filter(
+				(_, index) => index !== taskNumber - 1,
+			);
 			await update(ref, { todo_list: updatedList });
 			await sendMessage(event.replyToken, [
 				{ type: "text", text: `タスク「${deletedTask}」を削除しました。` },
