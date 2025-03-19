@@ -248,19 +248,6 @@ type MessageType = {
 	};
 };
 
-// メッセージ送信関数を定義
-async function sendMessage(replyToken: string, messages: MessageType[]) {
-	await client.replyMessage({
-		replyToken,
-		messages: messages.map((msg) => ({
-			type: "text",
-			text: msg.text,
-			emojis: msg.emojis,
-			quickReply: msg.quickReply,
-		})),
-	});
-}
-
 // ✅ LINE Bot のメッセージ処理
 const textEventHandler = async (
 	event: webhook.Event,
@@ -280,6 +267,23 @@ const textEventHandler = async (
 	async function update(db: Reference, new_config: Partial<Config>) {
 		await db.update(new_config);
 		config = await get(ref);
+	}
+
+	// メッセージ送信関数を定義
+	async function sendMessage(replyToken: string, messages: MessageType[]) {
+		await client.replyMessage({
+			replyToken,
+			messages: messages.map((msg) => ({
+				type: "text",
+				text: msg.text,
+				emojis: msg.emojis,
+				quickReply: msg.quickReply,
+				sender: {
+					name: "test",
+				},
+			})),
+			notificationDisabled: config.is_silent,
+		});
 	}
 
 	const splitMessage = userMessage

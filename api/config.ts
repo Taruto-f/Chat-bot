@@ -6,6 +6,7 @@ export interface Config {
 	todo_list: string[]; // やることリスト
 	reminder_enabled: boolean; // リマインダーが有効か
 	last_reminder: number; // 最後にリマインダーを送った時間
+	is_silent: boolean; // 通知をしないか
 }
 
 export const defaultConfig: Config = {
@@ -18,4 +19,5 @@ export const defaultConfig: Config = {
 	todo_list: [], // やることリスト
 	reminder_enabled: false, // リマインダーはデフォルトで無効
 	last_reminder: 0, // 最後にリマインダーを送った時間
+	is_silent: false, // 通知をしないか
 };
