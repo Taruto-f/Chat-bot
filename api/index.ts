@@ -17,6 +17,7 @@ import { getDatabase, type Reference } from "firebase-admin/database";
 import { defaultConfig, type Config } from "./config";
 import { get } from "./db";
 import { getWeatherForecast } from "./weather";
+import { getEarthquakeInfo } from "./earthquake";
 
 // LINE Bot の設定
 const serviceAccount: Record<string, string> = JSON.parse(
@@ -1057,6 +1058,17 @@ app.post(
 		res.status(200).json({ status: "success", results });
 	},
 );
+
+// 地震情報を取得するエンドポイント
+app.get("/api/earthquake", async (req: Request, res: Response) => {
+	try {
+		const earthquakeData = await getEarthquakeInfo();
+		res.json(earthquakeData);
+	} catch (error) {
+		console.error('地震情報の取得に失敗しました:', error);
+		res.status(500).json({ error: '地震情報の取得に失敗しました' });
+	}
+});
 
 // ✅ サーバー起動
 app.listen(PORT, () => {
