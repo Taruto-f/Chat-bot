@@ -270,7 +270,11 @@ const textEventHandler = async (
 	}
 
 	// メッセージ送信関数を定義
-	async function sendMessage(replyToken: string, messages: MessageType[]) {
+	async function sendMessage(
+		replyToken: string,
+		messages: MessageType[],
+		showName?: string,
+	) {
 		await client.replyMessage({
 			replyToken,
 			messages: messages.map((msg) => ({
@@ -278,6 +282,9 @@ const textEventHandler = async (
 				text: msg.text,
 				emojis: msg.emojis,
 				quickReply: msg.quickReply,
+				sender: {
+					name: showName,
+				},
 			})),
 			notificationDisabled: config.is_silent,
 		});
@@ -401,18 +408,26 @@ const textEventHandler = async (
 	} else if (userMessage === "!!db") {
 		// デバッグ用　データベース出力
 		const json = JSON.stringify(await get(ref));
-		await sendMessage(event.replyToken, [{ type: "text", text: json }]);
-	} else if (userMessage === "天気") {
+		await sendMessage(
+			event.replyToken,
+			[{ type: "text", text: json }],
+			"DB Show for Admin",
+		);
+	} else if (userMessage === "1" || userMessage === "天気") {
 		try {
 			const forecast = await getWeatherForecast(config.weather_zone);
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: `【${forecast.targetArea}の天気予報】` },
-				{ type: "text", text: forecast.text },
-				{
-					type: "text",
-					text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
-				},
-			]);
+			await sendMessage(
+				event.replyToken,
+				[
+					{ type: "text", text: `【${forecast.targetArea}の天気予報】` },
+					{ type: "text", text: forecast.text },
+					{
+						type: "text",
+						text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
+					},
+				],
+				"天気情報",
+			);
 		} catch (error) {
 			await sendMessage(event.replyToken, [
 				{
@@ -539,25 +554,6 @@ const textEventHandler = async (
 				},
 			},
 		]);
-	} else if (userMessage === "1" || userMessage === "天気") {
-		try {
-			const forecast = await getWeatherForecast(config.weather_zone);
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: `【${forecast.targetArea}の天気予報】` },
-				{ type: "text", text: forecast.text },
-				{
-					type: "text",
-					text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
-				},
-			]);
-		} catch (error) {
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。",
-				},
-			]);
-		}
 	} else if (userMessage === "2" || userMessage === "クイズ") {
 		const userId = event.source?.userId || "anonymous";
 		await update(ref, { quiz_status: true });
@@ -594,10 +590,14 @@ const textEventHandler = async (
 		const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
 		const luckyColor =
 			luckyColors[Math.floor(Math.random() * luckyColors.length)];
-		await sendMessage(event.replyToken, [
-			{ type: "text", text: `今日の運勢：${fortune}` },
-			{ type: "text", text: `ラッキーカラー：${luckyColor}` },
-		]);
+		await sendMessage(
+			event.replyToken,
+			[
+				{ type: "text", text: `今日の運勢：${fortune}` },
+				{ type: "text", text: `ラッキーカラー：${luckyColor}` },
+			],
+			"占い",
+		);
 	} else if (userMessage === "4" || userMessage === "挨拶") {
 		await sendMessage(event.replyToken, [
 			{
@@ -666,7 +666,11 @@ const textEventHandler = async (
 			マグニチュード: ${earthquakeData.magnitude}
 			=========================
 			`;
-			await sendMessage(event.replyToken, [{ type: "text", text: message }]);
+			await sendMessage(
+				event.replyToken,
+				[{ type: "text", text: message }],
+				"地震情報",
+			);
 		} catch (error) {
 			await sendMessage(event.replyToken, [
 				{
@@ -837,7 +841,11 @@ const textEventHandler = async (
 			const result = await model.generateContent(userMessage);
 			const response = await result.response;
 			const text = response.text();
-			await sendMessage(event.replyToken, [{ type: "text", text }]);
+			await sendMessage(
+				event.replyToken,
+				[{ type: "text", text }],
+				"AIチャット",
+			);
 		} else {
 			if (event.source?.type === "user") {
 				await sendMessage(event.replyToken, [
