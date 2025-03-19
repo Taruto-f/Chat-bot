@@ -456,6 +456,16 @@ const textEventHandler = async (
 				}
 			}
 		}
+	} else if (userMessage === "通知オン") {
+		await update(ref, { is_silent: false });
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "通知を有効にしました。" },
+		]);
+	} else if (userMessage === "通知オフ") {
+		await update(ref, { is_silent: true });
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "通知を無効にしました。" },
+		]);
 	} else if (userMessage === "機能一覧") {
 		await sendMessage(event.replyToken, [
 			{
