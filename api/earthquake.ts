@@ -25,12 +25,12 @@ export async function getEarthquakeInfo(): Promise<EarthquakeData[]> {
     return response.data.map((quake: any) => ({
       id: quake.id,
       time: quake.time,
-      magnitude: quake.magnitude,
-      location: quake.place,
-      depth: quake.depth || null,
-      intensity: quake.intensity,
-      latitude: quake.latitude,
-      longitude: quake.longitude
+      magnitude: quake.magnitude || 0,
+      location: quake.place || '不明',
+      depth: quake.depth === undefined ? null : Number(quake.depth),
+      intensity: quake.intensity || '不明',
+      latitude: quake.latitude || 0,
+      longitude: quake.longitude || 0
     }));
   } catch (error) {
     console.error('地震情報の取得に失敗しました:', error);
