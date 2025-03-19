@@ -652,7 +652,16 @@ const textEventHandler = async (
 	} else if (userMessage === "6" || userMessage === "地震") {
 		try {
 			const earthquakeData = await getEarthquakeInfo();
-			const message = `【最新の地震情報】\n\n${earthquakeData.time}\n震源地: ${earthquakeData.location}\n震度: ${earthquakeData.intensity}\n深さ: ${earthquakeData.depth}km\nマグニチュード: ${earthquakeData.magnitude}`;
+			const message = `【最新の地震情報】
+			\n\n
+			\n=========================
+			\n発生時刻: ${earthquakeData.time}
+			\n震源地: ${earthquakeData.location}
+			\n最大震度: ${earthquakeData.intensity}
+			\n深さ: ${earthquakeData.depth}km
+			\nマグニチュード: ${earthquakeData.magnitude}
+			\n=========================
+			`;
 			await sendMessage(event.replyToken, [{ type: "text", text: message }]);
 		} catch (error) {
 			await sendMessage(event.replyToken, [
