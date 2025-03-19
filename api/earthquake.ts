@@ -5,7 +5,7 @@ interface EarthquakeData {
   time: string;
   magnitude: number;
   location: string;
-  depth: number;
+  depth: number | null;
   intensity: string;
   latitude: number;
   longitude: number;
@@ -27,7 +27,7 @@ export async function getEarthquakeInfo(): Promise<EarthquakeData[]> {
       time: quake.time,
       magnitude: quake.magnitude,
       location: quake.place,
-      depth: quake.depth,
+      depth: quake.depth || null,
       intensity: quake.intensity,
       latitude: quake.latitude,
       longitude: quake.longitude

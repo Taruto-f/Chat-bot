@@ -927,7 +927,7 @@ const textEventHandler = async (
 				`発生時刻: ${new Date(quake.time).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}\n` +
 				`場所: ${quake.location}\n` +
 				`マグニチュード: ${quake.magnitude}\n` +
-				`深さ: ${quake.depth}km\n` +
+				`深さ: ${quake.depth ? `${quake.depth}km` : '不明'}\n` +
 				`震度: ${quake.intensity}\n` +
 				`緯度: ${quake.latitude}\n` +
 				`経度: ${quake.longitude}\n` +
