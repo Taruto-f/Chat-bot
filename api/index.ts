@@ -639,10 +639,10 @@ const textEventHandler = async (
 			const nextQuestionId = getNextQuestion();
 			await update(ref, { current_question: nextQuestionId });
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
-			const nextQuestionMessage = [
-				{ type: "text", text: "次の問題です！" },
-				{ type: "text", text: `Q. ${nextQuestion.question}` },
-				{ type: "text", text: "答えを入力してください！" },
+			const nextQuestionMessage: MessageType[] = [
+				{ type: "text" as const, text: "次の問題です！" },
+				{ type: "text" as const, text: `Q. ${nextQuestion.question}` },
+				{ type: "text" as const, text: "答えを入力してください！" },
 			];
 
 			// スコアが未定義の場合は0で初期化
