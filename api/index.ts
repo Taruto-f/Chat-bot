@@ -228,7 +228,14 @@ const getNextQuestion = () => {
 };
 
 // メッセージタイプの型を定義
-type MessageType = TextMessage & {
+type MessageType = {
+	type: "text";
+	text: string;
+	emojis?: Array<{
+		index: number;
+		productId: string;
+		emojiId: string;
+	}>;
 	quickReply?: {
 		items: Array<{
 			type: "action";
