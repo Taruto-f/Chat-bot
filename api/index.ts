@@ -667,14 +667,14 @@ const textEventHandler = async (
 		try {
 			const earthquakeData = await getEarthquakeInfo();
 			const message = `【最新の地震情報】
-			\n\n
-			\n=========================
-			\n発生時刻: ${earthquakeData.time}
-			\n震源地: ${earthquakeData.location}
-			\n最大震度: ${earthquakeData.intensity}
-			\n深さ: ${earthquakeData.depth}km
-			\nマグニチュード: ${earthquakeData.magnitude}
-			\n=========================
+			\n
+			=========================
+			発生時刻: ${earthquakeData.time}
+			震源地: ${earthquakeData.location}
+			最大震度: ${earthquakeData.intensity}
+			深さ: ${earthquakeData.depth}km
+			マグニチュード: ${earthquakeData.magnitude}
+			=========================
 			`;
 			await sendMessage(event.replyToken, [{ type: "text", text: message }]);
 		} catch (error) {
