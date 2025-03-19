@@ -252,11 +252,11 @@ type MessageType = {
 async function sendMessage(replyToken: string, messages: MessageType[]) {
 	await client.replyMessage({
 		replyToken,
-		messages: messages.map(msg => ({
+		messages: messages.map((msg) => ({
 			type: "text",
 			text: msg.text,
 			emojis: msg.emojis,
-			quickReply: msg.quickReply
+			quickReply: msg.quickReply,
 		})),
 	});
 }
@@ -292,9 +292,13 @@ const textEventHandler = async (
 		const result = Math.random() < 0.5 ? "Yes" : "No";
 		await sendMessage(event.replyToken, [{ type: "text", text: result }]);
 	} else if (userMessage === "数字") {
-		await sendMessage(event.replyToken, [{ type: "text", text: String(Math.random()) }]);
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: String(Math.random()) },
+		]);
 	} else if (/ありがとう/.test(userMessage)) {
-		await sendMessage(event.replyToken, [{ type: "text", text: "どういたしまして" }]);
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "どういたしまして" },
+		]);
 	} else if (/さようなら/.test(userMessage)) {
 		await sendMessage(event.replyToken, [{ type: "text", text: "またね" }]);
 	} else if (/おはよう/.test(userMessage)) {
@@ -313,7 +317,8 @@ const textEventHandler = async (
 		];
 		const luckyColors = ["赤", "青", "緑", "黄", "紫", "ピンク", "オレンジ"];
 		const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-		const luckyColor = luckyColors[Math.floor(Math.random() * luckyColors.length)];
+		const luckyColor =
+			luckyColors[Math.floor(Math.random() * luckyColors.length)];
 		await sendMessage(event.replyToken, [
 			{ type: "text", text: `今日の運勢：${fortune}` },
 			{ type: "text", text: `ラッキーカラー：${luckyColor}` },
@@ -335,14 +340,19 @@ const textEventHandler = async (
 		const firstQuestion = QUIZ_QUESTIONS[firstQuestionId];
 
 		await sendMessage(event.replyToken, [
-			{ type: "text", text: "クイズを開始します！スコアは0点にリセットされました。" },
+			{
+				type: "text",
+				text: "クイズを開始します！スコアは0点にリセットされました。",
+			},
 			{ type: "text", text: firstQuestion.question },
 			{ type: "text", text: "答えを入力してください！" },
 		]);
 	} else if (userMessage === "クイズ終了") {
 		const userId = event.source?.userId ?? "anonymous";
 		await update(ref, { quiz_status: false });
-		await sendMessage(event.replyToken, [{ type: "text", text: "クイズを終了しました！" }]);
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "クイズを終了しました！" },
+		]);
 	} else if (userMessage === "次のクイズ") {
 		if (config.quiz_status) {
 			const nextQuestionId = getNextQuestion();
@@ -356,7 +366,10 @@ const textEventHandler = async (
 			]);
 		} else {
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: "クイズを開始するには「クイズ」と入力してください。" },
+				{
+					type: "text",
+					text: "クイズを開始するには「クイズ」と入力してください。",
+				},
 			]);
 		}
 	} else if (userMessage.startsWith("ANSWER:")) {
@@ -371,14 +384,19 @@ const textEventHandler = async (
 			});
 		}
 		await sendMessage(event.replyToken, [
-			{ type: "text", text: `あなたの現在のスコアは ${config.user_scores[userId]} 点です！` },
+			{
+				type: "text",
+				text: `あなたの現在のスコアは ${config.user_scores[userId]} 点です！`,
+			},
 		]);
 	} else if (userMessage === "リセット") {
 		const userId = event.source?.userId ?? "anonymous";
 		await update(quizScoreRef, {
 			[userId]: 0,
 		});
-		await sendMessage(event.replyToken, [{ type: "text", text: "スコアをリセットしました！" }]);
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "スコアをリセットしました！" },
+		]);
 	} else if (userMessage === "!!db") {
 		// デバッグ用　データベース出力
 		const json = JSON.stringify(await get(ref));
@@ -396,13 +414,19 @@ const textEventHandler = async (
 			]);
 		} catch (error) {
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。" },
+				{
+					type: "text",
+					text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。",
+				},
 			]);
 		}
 	} else if (splitMessage[0] === "天気ゾーン") {
 		if (splitMessage.length === 1) {
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: "「天気ゾーン (ゾーン番号)」と入力することで天気ゾーンを設定できます。\n天気ゾーン一覧はこちら: https://x.gd/lhdUU" },
+				{
+					type: "text",
+					text: "「天気ゾーン (ゾーン番号)」と入力することで天気ゾーンを設定できます。\n天気ゾーン一覧はこちら: https://x.gd/lhdUU",
+				},
 				{ type: "text", text: `現在の天気ゾーン: ${config.weather_zone}` },
 			]);
 		} else {
@@ -413,11 +437,17 @@ const textEventHandler = async (
 					await update(ref, { weather_zone: zone });
 					await sendMessage(event.replyToken, [
 						{ type: "text", text: `天気ゾーンを${zone}に設定しました。` },
-						{ type: "text", text: `地域: ${weather.targetArea}\n発表者: ${weather.publishingOffice}` },
+						{
+							type: "text",
+							text: `地域: ${weather.targetArea}\n発表者: ${weather.publishingOffice}`,
+						},
 					]);
 				} catch (error) {
 					await sendMessage(event.replyToken, [
-						{ type: "text", text: "天気ゾーンが正しく入力されていません。\n「天気ゾーン (ゾーン番号)」と入力してください。\nゾーン番号は6桁の半角数字です。" },
+						{
+							type: "text",
+							text: "天気ゾーンが正しく入力されていません。\n「天気ゾーン (ゾーン番号)」と入力してください。\nゾーン番号は6桁の半角数字です。",
+						},
 					]);
 				}
 			}
@@ -426,7 +456,8 @@ const textEventHandler = async (
 		await sendMessage(event.replyToken, [
 			{
 				type: "text",
-				text: "以下の機能が利用できます：\n\n" +
+				text:
+					"以下の機能が利用できます：\n\n" +
 					"1. 天気予報\n" +
 					"2. クイズ\n" +
 					"3. 占い\n" +
@@ -510,7 +541,10 @@ const textEventHandler = async (
 			]);
 		} catch (error) {
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。" },
+				{
+					type: "text",
+					text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。",
+				},
 			]);
 		}
 	} else if (userMessage === "2" || userMessage === "クイズ") {
@@ -530,7 +564,10 @@ const textEventHandler = async (
 		const firstQuestion = QUIZ_QUESTIONS[firstQuestionId];
 
 		await sendMessage(event.replyToken, [
-			{ type: "text", text: "クイズを開始します！スコアは0点にリセットされました。" },
+			{
+				type: "text",
+				text: "クイズを開始します！スコアは0点にリセットされました。",
+			},
 			{ type: "text", text: firstQuestion.question },
 			{ type: "text", text: "答えを入力してください！" },
 		]);
@@ -544,7 +581,8 @@ const textEventHandler = async (
 		];
 		const luckyColors = ["赤", "青", "緑", "黄", "紫", "ピンク", "オレンジ"];
 		const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-		const luckyColor = luckyColors[Math.floor(Math.random() * luckyColors.length)];
+		const luckyColor =
+			luckyColors[Math.floor(Math.random() * luckyColors.length)];
 		await sendMessage(event.replyToken, [
 			{ type: "text", text: `今日の運勢：${fortune}` },
 			{ type: "text", text: `ラッキーカラー：${luckyColor}` },
@@ -614,24 +652,14 @@ const textEventHandler = async (
 	} else if (userMessage === "6" || userMessage === "地震") {
 		try {
 			const earthquakeData = await getEarthquakeInfo();
-			const message = earthquakeData.map(quake => 
-				`発生時刻: ${new Date(quake.time).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}\n` +
-				`場所: ${quake.location}\n` +
-				`マグニチュード: ${quake.magnitude}\n` +
-				`深さ: ${quake.depth ? `${quake.depth}km` : '不明'}\n` +
-				`震度: ${quake.intensity}\n` +
-				`津波: ${quake.tsunami}\n` +
-				`緯度: ${quake.latitude}\n` +
-				`経度: ${quake.longitude}\n` +
-				"-------------------"
-			).join("\n");
-
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: `【最新の地震情報】\n\n${message}` },
-			]);
+			const message = `【最新の地震情報】\n\n${earthquakeData.time}\n震源地: ${earthquakeData.location}\n震度: ${earthquakeData.intensity}\n深さ: ${earthquakeData.depth}km\nマグニチュード: ${earthquakeData.magnitude}`;
+			await sendMessage(event.replyToken, [{ type: "text", text: message }]);
 		} catch (error) {
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: "申し訳ありません。地震情報の取得に失敗しました。" },
+				{
+					type: "text",
+					text: "申し訳ありません。地震情報の取得に失敗しました。",
+				},
 			]);
 		}
 	} else if (userMessage === "7" || userMessage === "やることリスト") {
@@ -756,19 +784,31 @@ const textEventHandler = async (
 				});
 				await sendMessage(event.replyToken, [
 					{ type: "text", text: "正解です！" },
-					{ type: "text", text: `+10点！ 現在のスコア: ${config.user_scores[userId]}点` },
+					{
+						type: "text",
+						text: `+10点！ 現在のスコア: ${config.user_scores[userId]}点`,
+					},
 					...nextQuestionMessage,
 				]);
 			} else {
 				await sendMessage(event.replyToken, [
-					{ type: "text", text: `残念ながら不正解です。\n正解は「${currentQuestion.answer}」でした。` },
-					{ type: "text", text: `現在のスコア: ${config.user_scores[userId]}点` },
+					{
+						type: "text",
+						text: `残念ながら不正解です。\n正解は「${currentQuestion.answer}」でした。`,
+					},
+					{
+						type: "text",
+						text: `現在のスコア: ${config.user_scores[userId]}点`,
+					},
 					...nextQuestionMessage,
 				]);
 			}
 		} else {
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: "申し訳ありません。そのコマンドは認識できませんでした。\n「機能一覧」と入力して利用可能な機能を確認してください。" },
+				{
+					type: "text",
+					text: "申し訳ありません。そのコマンドは認識できませんでした。\n「機能一覧」と入力して利用可能な機能を確認してください。",
+				},
 			]);
 		}
 	}
