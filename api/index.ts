@@ -546,14 +546,6 @@ const textEventHandler = async (
 										text: "クリア",
 									},
 								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: config.reminder_enabled ? "リマインダーをオフ" : "リマインダーをオン",
-										text: config.reminder_enabled ? "リマインダーオフ" : "リマインダーオン",
-									},
-								},
 							],
 						},
 					},
@@ -633,30 +625,16 @@ const textEventHandler = async (
 				],
 			});
 		}
-	} else if (userMessage === "リマインダーオン") {
+	} else if (userMessage === "クリア") {
 		await update(ref, {
-			reminder_enabled: true,
-			last_reminder: Date.now(),
+			todo_list: [],
 		});
 		await client.replyMessage({
 			replyToken: event.replyToken,
 			messages: [
 				{
 					type: "text",
-					text: "2時間おきのリマインダーをオンにしました。\nやることリストの内容を定期的に通知します。",
-				},
-			],
-		});
-	} else if (userMessage === "リマインダーオフ") {
-		await update(ref, {
-			reminder_enabled: false,
-		});
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "リマインダーをオフにしました。",
+					text: "やることリストをクリアしました。",
 				},
 			],
 		});
@@ -688,19 +666,6 @@ const textEventHandler = async (
 				],
 			});
 		}
-	} else if (userMessage === "クリア") {
-		await update(ref, {
-			todo_list: [],
-		});
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "やることリストをクリアしました。",
-				},
-			],
-		});
 	} else if (userMessage === "機能一覧") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
@@ -761,8 +726,8 @@ const textEventHandler = async (
 								type: "action",
 								action: {
 									type: "message",
-									label: "やることリストを表示",
-									text: "やることリストを表示",
+									label: "やることリスト",
+									text: "やることリスト",
 								},
 							},
 						],
@@ -1097,48 +1062,3 @@ app.post(
 app.listen(PORT, () => {
 	console.log(`Application is live and listening on port ${PORT}`);
 });
-
-// リマインダーをチェックする関数
-async function checkReminders() {
-	const ref = db.ref("data");
-	const snapshot = await ref.once("value");
-	const data = snapshot.val();
-
-	if (!data) return;
-
-	Object.entries(data).forEach(async ([key, value]: [string, any]) => {
-		if (value.reminder_enabled && value.todo_list && value.todo_list.length > 0) {
-			const now = Date.now();
-			const lastReminder = value.last_reminder || 0;
-			const twoHours = 2 * 60 * 60 * 1000; // 2時間をミリ秒で表現
-
-			if (now - lastReminder >= twoHours) {
-				const todoList = value.todo_list
-					.map((todo: string, index: number) => `${index + 1}. ${todo}`)
-					.join("\n");
-
-				try {
-					await client.pushMessage({
-						to: key,
-						messages: [
-							{
-								type: "text",
-								text: `【やることリストのリマインダー】\n\n${todoList}`,
-							},
-						],
-					});
-
-					// 最後のリマインダー時間を更新
-					await ref.child(key).update({
-						last_reminder: now,
-					});
-				} catch (error) {
-					console.error(`Failed to send reminder to ${key}:`, error);
-				}
-			}
-		}
-	});
-}
-
-// 1分ごとにリマインダーをチェック
-setInterval(checkReminders, 60 * 1000);
