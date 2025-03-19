@@ -409,10 +409,10 @@ const textEventHandler = async (
 			await client.replyMessage({
 				replyToken: event.replyToken,
 				messages: [
-					{ type: "textV2", text: `【${forecast.targetArea}の天気予報】` },
-					{ type: "textV2", text: forecast.text },
+					{ type: "text", text: `【${forecast.targetArea}の天気予報】` },
+					{ type: "text", text: forecast.text },
 					{
-						type: "textV2",
+						type: "text",
 						text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
 					},
 				],
@@ -422,7 +422,7 @@ const textEventHandler = async (
 				replyToken: event.replyToken,
 				messages: [
 					{
-						type: "textV2",
+						type: "text",
 						text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。",
 					},
 				],
@@ -473,270 +473,8 @@ const textEventHandler = async (
 							},
 						],
 					});
-				}
-			} else {
-				await client.replyMessage({
-					replyToken: event.replyToken,
-					messages: [
-						{
-							type: "textV2",
-							text: "天気ゾーンが正しく入力されていません。\n「天気ゾーン (ゾーン番号)」と入力してください。\nゾーン番号は6桁の半角数字です。",
-						},
-					],
-				});
 			}
 		}
-	} else if (userMessage === "漢字") {
-		// ランダムな漢字をいう
-		const kanji = String.fromCharCode(
-			0x4e00 + Math.floor(Math.random() * (0x9faf - 0x4e00 + 1)),
-		);
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: kanji }],
-		});
-	} else if (userMessage === "やることリスト" || userMessage === "やることリストを表示") {
-		const todoList = config.todo_list || [];
-		if (todoList.length === 0) {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "やることリストは空です。\n「追加: タスク」の形式で新しいタスクを追加できます。",
-						quickReply: {
-							items: [
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "タスクを追加",
-										text: "追加: 新しいタスク",
-									},
-								},
-							],
-						},
-					},
-				],
-			});
-		} else {
-			const todoListText = todoList
-				.map((todo, index) => `${index + 1}. ${todo}`)
-				.join("\n");
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: `【やることリスト】\n${todoListText}\n\n「削除: 番号」の形式でタスクを削除できます。`,
-						quickReply: {
-							items: [
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "タスクを追加",
-										text: "追加: 新しいタスク",
-									},
-								},
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "リストをクリア",
-										text: "クリア",
-									},
-								},
-							],
-						},
-					},
-				],
-			});
-		}
-	} else if (userMessage === "追加: 新しいタスク") {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "追加したいタスクの内容を入力してください。\n例: 追加: 買い物に行く",
-					quickReply: {
-						items: [
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "やることリストを表示",
-									text: "やることリストを表示",
-								},
-							},
-						],
-					},
-				},
-			],
-		});
-	} else if (userMessage.startsWith("追加: ")) {
-		const newTask = userMessage.slice(3);
-		if (newTask.trim() === "") {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "タスクの内容を入力してください。\n例: 追加: 買い物に行く",
-						quickReply: {
-							items: [
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "やることリストを表示",
-										text: "やることリスト",
-									},
-								},
-							],
-						},
-					},
-				],
-			});
-		} else {
-			const todoList = config.todo_list || [];
-			await update(ref, {
-				todo_list: [...todoList, newTask],
-			});
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: `タスク「${newTask}」を追加しました。`,
-						quickReply: {
-							items: [
-								{
-									type: "action",
-									action: {
-										type: "message",
-										label: "やることリストを表示",
-										text: "やることリストを表示",
-									},
-								},
-							],
-						},
-					},
-				],
-			});
-		}
-	} else if (userMessage === "クリア") {
-		await update(ref, {
-			todo_list: [],
-		});
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "やることリストをクリアしました。",
-				},
-			],
-		});
-	} else if (userMessage.startsWith("削除: ")) {
-		const taskNumber = parseInt(userMessage.slice(3));
-		if (isNaN(taskNumber) || taskNumber < 1 || taskNumber > config.todo_list.length) {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "正しいタスク番号を入力してください。\n例: 削除: 1",
-					},
-				],
-			});
-		} else {
-			const deletedTask = config.todo_list[taskNumber - 1];
-			const newTodoList = config.todo_list.filter((_, index) => index !== taskNumber - 1);
-			await update(ref, {
-				todo_list: newTodoList,
-			});
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: `タスク「${deletedTask}」を削除しました。`,
-					},
-				],
-			});
-		}
-	} else if (userMessage === "機能") {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "以下のボタンから機能を選択してください。",
-					quickReply: {
-						items: [
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "天気予報",
-									text: "天気",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "クイズ",
-									text: "クイズ",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "占い",
-									text: "占い",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "挨拶",
-									text: "挨拶",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "質問",
-									text: "質問",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "地震情報",
-									text: "地震",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "やることリスト",
-									text: "やることリスト",
-								},
-							},
-						],
-					},
-				},
-			],
-		});
 	} else if (userMessage === "機能一覧") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
@@ -751,7 +489,7 @@ const textEventHandler = async (
 						"5. AI質問\n" +
 						"6. 地震情報\n" +
 						"7. やることリスト\n\n" +
-						"各機能を使用するには、以下のボタンから選択してください。",
+						"各機能を使用するには、番号を入力するか、以下のボタンから選択してください。",
 					quickReply: {
 						items: [
 							{
@@ -815,35 +553,17 @@ const textEventHandler = async (
 				},
 			],
 		});
-	} else if (userMessage === "質問") {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "質問を入力してください。AIが回答します。",
-				},
-			],
-		});
-	} else if (userMessage.endsWith("?") || userMessage.endsWith("？")) {
+	} else if (userMessage === "1" || userMessage === "天気") {
 		try {
-			const question = userMessage;
-			const result = await model.generateContent(question);
-			const response = await result.response;
-			const text = response.text();
-
-			if (event.source?.type === "user") {
-				await client.showLoadingAnimation({
-					chatId: event.source.userId ?? "",
-				});
-			}
-
+			const forecast = await getWeatherForecast(config.weather_zone);
 			await client.replyMessage({
 				replyToken: event.replyToken,
 				messages: [
+					{ type: "text", text: `【${forecast.targetArea}の天気予報】` },
+					{ type: "text", text: forecast.text },
 					{
 						type: "text",
-						text: text,
+						text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
 					},
 				],
 			});
@@ -853,74 +573,20 @@ const textEventHandler = async (
 				messages: [
 					{
 						type: "text",
-						text: "申し訳ありません。回答の生成に失敗しました。",
+						text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。",
 					},
 				],
 			});
 		}
-	} else if (userMessage === "挨拶" || userMessage === "あいさつ") {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "以下のボタンから挨拶を選択してください。",
-					quickReply: {
-						items: [
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "ありがとう",
-									text: "ありがとう",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "さようなら",
-									text: "さようなら",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "おはよう",
-									text: "おはよう",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "こんにちは",
-									text: "こんにちは",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "こんばんは",
-									text: "こんばんは",
-								},
-							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "おやすみ",
-									text: "おやすみ",
-								},
-							},
-						],
-					},
-				},
-			],
-		});
-	} else if (userMessage === "地震") {
+	} else if (userMessage === "2" || userMessage === "クイズ") {
+		// クイズの処理
+	} else if (userMessage === "3" || userMessage === "占い") {
+		// 占いの処理
+	} else if (userMessage === "4" || userMessage === "挨拶") {
+		// 挨拶の処理
+	} else if (userMessage === "5" || userMessage === "質問") {
+		// AI質問の処理
+	} else if (userMessage === "6" || userMessage === "地震") {
 		try {
 			const earthquakeData = await getEarthquakeInfo();
 			const message = earthquakeData.map(quake => 
@@ -955,6 +621,8 @@ const textEventHandler = async (
 				],
 			});
 		}
+	} else if (userMessage === "7" || userMessage === "やることリスト") {
+		// やることリストの処理
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
 
