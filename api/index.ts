@@ -228,9 +228,7 @@ const getNextQuestion = () => {
 };
 
 // メッセージタイプの型を定義
-type MessageType = {
-	type: "text";
-	text: string;
+type MessageType = TextMessage & {
 	quickReply?: {
 		items: Array<{
 			type: "action";
@@ -247,7 +245,11 @@ type MessageType = {
 async function sendMessage(replyToken: string, messages: MessageType[]) {
 	await client.replyMessage({
 		replyToken,
-		messages: messages as TextMessage[],
+		messages: messages.map(msg => ({
+			type: "text",
+			text: msg.text,
+			emojis: msg.emojis
+		})),
 	});
 }
 
@@ -640,9 +642,9 @@ const textEventHandler = async (
 			await update(ref, { current_question: nextQuestionId });
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
 			const nextQuestionMessage: MessageType[] = [
-				{ type: "text" as const, text: "次の問題です！" },
-				{ type: "text" as const, text: `Q. ${nextQuestion.question}` },
-				{ type: "text" as const, text: "答えを入力してください！" },
+				{ type: "text", text: "次の問題です！" },
+				{ type: "text", text: `Q. ${nextQuestion.question}` },
+				{ type: "text", text: "答えを入力してください！" },
 			];
 
 			// スコアが未定義の場合は0で初期化
