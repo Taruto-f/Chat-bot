@@ -653,16 +653,9 @@ const textEventHandler = async (
 			},
 		]);
 	} else if (userMessage === "5" || userMessage === "質問") {
-		try {
-			const result = await model.generateContent(userMessage);
-			const response = await result.response;
-			const text = response.text();
-			await sendMessage(event.replyToken, [{ type: "text", text }]);
-		} catch (error) {
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: "申し訳ありません。AIの応答に失敗しました。" },
-			]);
-		}
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "末尾に「？」を付けて質問してね" },
+		]);
 	} else if (userMessage === "6" || userMessage === "地震") {
 		try {
 			const earthquakeData = await getEarthquakeInfo();
@@ -843,13 +836,20 @@ const textEventHandler = async (
 					...nextQuestionMessage,
 				]);
 			}
+		} else if (userMessage.endsWith("?") || userMessage.endsWith("？")) {
+			const result = await model.generateContent(userMessage);
+			const response = await result.response;
+			const text = response.text();
+			await sendMessage(event.replyToken, [{ type: "text", text }]);
 		} else {
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: "申し訳ありません。そのコマンドは認識できませんでした。\n「機能一覧」と入力して利用可能な機能を確認してください。",
-				},
-			]);
+			if (event.source?.type === "user") {
+				await sendMessage(event.replyToken, [
+					{
+						type: "text",
+						text: "申し訳ありません。そのコマンドは認識できませんでした。\n「機能一覧」と入力して利用可能な機能を確認してください。",
+					},
+				]);
+			}
 		}
 	}
 };
