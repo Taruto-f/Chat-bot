@@ -713,13 +713,19 @@ const textEventHandler = async (
 		}
 	} else if (userMessage === "やることリスト追加") {
 		await sendMessage(event.replyToken, [
-			{ type: "text", text: "追加するタスクを入力してください。\n例：やることリスト追加 買い物に行く" },
+			{
+				type: "text",
+				text: "追加するタスクを入力してください。\n例：やることリスト追加 買い物に行く",
+			},
 		]);
 	} else if (userMessage.startsWith("やることリスト追加 ")) {
 		const newTask = userMessage.replace("やることリスト追加 ", "").trim();
 		if (newTask === "") {
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: "タスクの内容を入力してください。\n例：やることリスト追加 買い物に行く" },
+				{
+					type: "text",
+					text: "タスクの内容を入力してください。\n例：やることリスト追加 買い物に行く",
+				},
 			]);
 		} else {
 			const updatedList = [...(config.todo_list || []), newTask];
@@ -738,18 +744,29 @@ const textEventHandler = async (
 				.map((todo, index) => `${index + 1}. ${todo}`)
 				.join("\n");
 			await sendMessage(event.replyToken, [
-				{ type: "text", text: `削除するタスクの番号を入力してください。\n\n【やることリスト】\n${todoList}` },
+				{
+					type: "text",
+					text: `削除するタスクの番号を入力してください。\n\n【やることリスト】\n${todoList}`,
+				},
 			]);
 		}
 	} else if (userMessage.startsWith("やることリスト削除 ")) {
-		const taskNumber = parseInt(userMessage.replace("やることリスト削除 ", "").trim());
-		if (isNaN(taskNumber) || taskNumber < 1 || taskNumber > config.todo_list.length) {
+		const taskNumber = Number.parseInt(
+			userMessage.replace("やることリスト削除 ", "").trim(),
+		);
+		if (
+			Number.isNaN(taskNumber) ||
+			taskNumber < 1 ||
+			taskNumber > config.todo_list.length
+		) {
 			await sendMessage(event.replyToken, [
 				{ type: "text", text: "正しいタスク番号を入力してください。" },
 			]);
 		} else {
 			const deletedTask = config.todo_list[taskNumber - 1];
-			const updatedList = config.todo_list.filter((_, index) => index !== taskNumber - 1);
+			const updatedList = config.todo_list.filter(
+				(_, index) => index !== taskNumber - 1,
+			);
 			await update(ref, { todo_list: updatedList });
 			await sendMessage(event.replyToken, [
 				{ type: "text", text: `タスク「${deletedTask}」を削除しました。` },
