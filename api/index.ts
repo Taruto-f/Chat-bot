@@ -929,6 +929,8 @@ const textEventHandler = async (
 				`マグニチュード: ${quake.magnitude}\n` +
 				`深さ: ${quake.depth}km\n` +
 				`震度: ${quake.intensity}\n` +
+				`緯度: ${quake.latitude}\n` +
+				`経度: ${quake.longitude}\n` +
 				"-------------------"
 			).join("\n");
 

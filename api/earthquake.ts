@@ -7,6 +7,8 @@ interface EarthquakeData {
   location: string;
   depth: number;
   intensity: string;
+  latitude: number;
+  longitude: number;
 }
 
 export async function getEarthquakeInfo(): Promise<EarthquakeData[]> {
@@ -15,7 +17,8 @@ export async function getEarthquakeInfo(): Promise<EarthquakeData[]> {
       params: {
         limit: 10,
         orderby: 'time',
-        order: 'desc'
+        order: 'desc',
+        type: 'earthquake'
       }
     });
 
@@ -25,7 +28,9 @@ export async function getEarthquakeInfo(): Promise<EarthquakeData[]> {
       magnitude: quake.magnitude,
       location: quake.place,
       depth: quake.depth,
-      intensity: quake.intensity
+      intensity: quake.intensity,
+      latitude: quake.latitude,
+      longitude: quake.longitude
     }));
   } catch (error) {
     console.error('地震情報の取得に失敗しました:', error);
