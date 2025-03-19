@@ -255,7 +255,8 @@ async function sendMessage(replyToken: string, messages: MessageType[]) {
 		messages: messages.map(msg => ({
 			type: "text",
 			text: msg.text,
-			emojis: msg.emojis
+			emojis: msg.emojis,
+			quickReply: msg.quickReply
 		})),
 	});
 }
