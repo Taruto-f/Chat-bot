@@ -14,7 +14,7 @@ interface EarthquakeData {
 
 export async function getEarthquakeInfo(): Promise<EarthquakeData[]> {
   try {
-    const response = await axios.get('https://www.jma.go.jp/bosai/quake/data/list.json', {
+    const response = await axios.get('https://www.jma.go.jp/bosai/quake/data/quake.json', {
       params: {
         limit: 10
       }
