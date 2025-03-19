@@ -9,16 +9,14 @@ interface EarthquakeData {
   intensity: string;
   latitude: number;
   longitude: number;
+  tsunami: string;
 }
 
 export async function getEarthquakeInfo(): Promise<EarthquakeData[]> {
   try {
-    const response = await axios.get('https://api.p2pquake.net/v2/history', {
+    const response = await axios.get('https://www.jma.go.jp/bosai/quake/data/list.json', {
       params: {
-        limit: 10,
-        orderby: 'time',
-        order: 'desc',
-        type: 'earthquake'
+        limit: 10
       }
     });
 
@@ -30,7 +28,8 @@ export async function getEarthquakeInfo(): Promise<EarthquakeData[]> {
       depth: quake.depth === undefined ? null : Number(quake.depth),
       intensity: quake.intensity || '不明',
       latitude: quake.latitude || 0,
-      longitude: quake.longitude || 0
+      longitude: quake.longitude || 0,
+      tsunami: quake.tsunami || 'なし'
     }));
   } catch (error) {
     console.error('地震情報の取得に失敗しました:', error);
