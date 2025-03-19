@@ -6,6 +6,7 @@ import {
 	type MiddlewareConfig,
 	type webhook,
 	HTTPFetchError,
+	type TextMessage,
 } from "@line/bot-sdk";
 import express, {
 	type Application,
@@ -226,6 +227,30 @@ const getNextQuestion = () => {
 	return Math.floor(Math.random() * QUIZ_QUESTIONS.length);
 };
 
+// メッセージタイプの型を定義
+type MessageType = {
+	type: "text";
+	text: string;
+	quickReply?: {
+		items: Array<{
+			type: "action";
+			action: {
+				type: "message";
+				label: string;
+				text: string;
+			};
+		}>;
+	};
+};
+
+// メッセージ送信関数を定義
+async function sendMessage(replyToken: string, messages: MessageType[]) {
+	await client.replyMessage({
+		replyToken,
+		messages: messages as TextMessage[],
+	});
+}
+
 // ✅ LINE Bot のメッセージ処理
 const textEventHandler = async (
 	event: webhook.Event,
@@ -255,40 +280,19 @@ const textEventHandler = async (
 
 	if (userMessage === "判定") {
 		const result = Math.random() < 0.5 ? "Yes" : "No";
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: result }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: result }]);
 	} else if (userMessage === "数字") {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: String(Math.random()) }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: String(Math.random()) }]);
 	} else if (/ありがとう/.test(userMessage)) {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "どういたしまして" }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: "どういたしまして" }]);
 	} else if (/さようなら/.test(userMessage)) {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "またね" }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: "またね" }]);
 	} else if (/おはよう/.test(userMessage)) {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "おはよう" }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: "おはよう" }]);
 	} else if (/こんにちは/.test(userMessage)) {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "こんにちは" }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: "こんにちは" }]);
 	} else if (/こんばんは/.test(userMessage)) {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "こんばんは" }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: "こんばんは" }]);
 	} else if (userMessage === "占い") {
 		const fortunes = [
 			"今日はとても良い日になりそうです！",
@@ -300,13 +304,10 @@ const textEventHandler = async (
 		const luckyColors = ["赤", "青", "緑", "黄", "紫", "ピンク", "オレンジ"];
 		const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
 		const luckyColor = luckyColors[Math.floor(Math.random() * luckyColors.length)];
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{ type: "text", text: `今日の運勢：${fortune}` },
-				{ type: "text", text: `ラッキーカラー：${luckyColor}` },
-			],
-		});
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: `今日の運勢：${fortune}` },
+			{ type: "text", text: `ラッキーカラー：${luckyColor}` },
+		]);
 	} else if (userMessage === "クイズ") {
 		const userId = event.source?.userId || "anonymous";
 		await update(ref, { quiz_status: true });
@@ -323,48 +324,30 @@ const textEventHandler = async (
 		});
 		const firstQuestion = QUIZ_QUESTIONS[firstQuestionId];
 
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "クイズを開始します！スコアは0点にリセットされました。",
-				},
-				{ type: "text", text: firstQuestion.question },
-				{ type: "text", text: "答えを入力してください！" },
-			],
-		});
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "クイズを開始します！スコアは0点にリセットされました。" },
+			{ type: "text", text: firstQuestion.question },
+			{ type: "text", text: "答えを入力してください！" },
+		]);
 	} else if (userMessage === "クイズ終了") {
 		const userId = event.source?.userId ?? "anonymous";
 		await update(ref, { quiz_status: false });
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "クイズを終了しました！" }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: "クイズを終了しました！" }]);
 	} else if (userMessage === "次のクイズ") {
 		if (config.quiz_status) {
 			const nextQuestionId = getNextQuestion();
 			await update(ref, { current_question: nextQuestionId });
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
 
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{ type: "text", text: "次の問題です！" },
-					{ type: "text", text: `Q. ${nextQuestion.question}` },
-					{ type: "text", text: "答えを入力してください！" },
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: "次の問題です！" },
+				{ type: "text", text: `Q. ${nextQuestion.question}` },
+				{ type: "text", text: "答えを入力してください！" },
+			]);
 		} else {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "クイズを開始するには「クイズ」と入力してください。",
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: "クイズを開始するには「クイズ」と入力してください。" },
+			]);
 		}
 	} else if (userMessage.startsWith("ANSWER:")) {
 		// これは内部処理用のメッセージなので無視
@@ -377,205 +360,148 @@ const textEventHandler = async (
 				[userId]: 0,
 			});
 		}
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: `あなたの現在のスコアは ${config.user_scores[userId]} 点です！`,
-				},
-			],
-		});
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: `あなたの現在のスコアは ${config.user_scores[userId]} 点です！` },
+		]);
 	} else if (userMessage === "リセット") {
 		const userId = event.source?.userId ?? "anonymous";
 		await update(quizScoreRef, {
 			[userId]: 0,
 		});
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: "スコアをリセットしました！" }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: "スコアをリセットしました！" }]);
 	} else if (userMessage === "!!db") {
 		// デバッグ用　データベース出力
 		const json = JSON.stringify(await get(ref));
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [{ type: "text", text: json }],
-		});
+		await sendMessage(event.replyToken, [{ type: "text", text: json }]);
 	} else if (userMessage === "天気") {
 		try {
 			const forecast = await getWeatherForecast(config.weather_zone);
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{ type: "text", text: `【${forecast.targetArea}の天気予報】` },
-					{ type: "text", text: forecast.text },
-					{
-						type: "text",
-						text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: `【${forecast.targetArea}の天気予報】` },
+				{ type: "text", text: forecast.text },
+				{
+					type: "text",
+					text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
+				},
+			]);
 		} catch (error) {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。",
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。" },
+			]);
 		}
 	} else if (splitMessage[0] === "天気ゾーン") {
 		if (splitMessage.length === 1) {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "「天気ゾーン (ゾーン番号)」と入力することで天気ゾーンを設定できます。\n天気ゾーン一覧はこちら: https://x.gd/lhdUU",
-					},
-					{
-						type: "text",
-						text: `現在の天気ゾーン: ${config.weather_zone}`,
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: "「天気ゾーン (ゾーン番号)」と入力することで天気ゾーンを設定できます。\n天気ゾーン一覧はこちら: https://x.gd/lhdUU" },
+				{ type: "text", text: `現在の天気ゾーン: ${config.weather_zone}` },
+			]);
 		} else {
 			const zone = splitMessage[1];
 			if (/\d{6}/.test(zone)) {
 				try {
 					const weather = await getWeatherForecast(zone);
 					await update(ref, { weather_zone: zone });
-					await client.replyMessage({
-						replyToken: event.replyToken,
-						messages: [
-							{
-								type: "text",
-								text: `天気ゾーンを${zone}に設定しました。`,
-							},
-							{
-								type: "text",
-								text: `地域: ${weather.targetArea}\n発表者: ${weather.publishingOffice}`,
-							},
-						],
-					});
+					await sendMessage(event.replyToken, [
+						{ type: "text", text: `天気ゾーンを${zone}に設定しました。` },
+						{ type: "text", text: `地域: ${weather.targetArea}\n発表者: ${weather.publishingOffice}` },
+					]);
 				} catch (error) {
-					await client.replyMessage({
-						replyToken: event.replyToken,
-						messages: [
-							{
-								type: "text",
-								text: "天気ゾーンが正しく入力されていません。\n「天気ゾーン (ゾーン番号)」と入力してください。\nゾーン番号は6桁の半角数字です。",
-							},
-						],
-					});
+					await sendMessage(event.replyToken, [
+						{ type: "text", text: "天気ゾーンが正しく入力されていません。\n「天気ゾーン (ゾーン番号)」と入力してください。\nゾーン番号は6桁の半角数字です。" },
+					]);
 				}
 			}
 		}
 	} else if (userMessage === "機能一覧") {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "以下の機能が利用できます：\n\n" +
-						"1. 天気予報\n" +
-						"2. クイズ\n" +
-						"3. 占い\n" +
-						"4. 挨拶\n" +
-						"5. AI質問\n" +
-						"6. 地震情報\n" +
-						"7. やることリスト\n\n" +
-						"各機能を使用するには、番号を入力するか、以下のボタンから選択してください。",
-					quickReply: {
-						items: [
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "天気予報",
-									text: "天気",
-								},
+		await sendMessage(event.replyToken, [
+			{
+				type: "text",
+				text: "以下の機能が利用できます：\n\n" +
+					"1. 天気予報\n" +
+					"2. クイズ\n" +
+					"3. 占い\n" +
+					"4. 挨拶\n" +
+					"5. AI質問\n" +
+					"6. 地震情報\n" +
+					"7. やることリスト\n\n" +
+					"各機能を使用するには、番号を入力するか、以下のボタンから選択してください。",
+				quickReply: {
+					items: [
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "天気予報",
+								text: "天気",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "クイズ",
-									text: "クイズ",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "クイズ",
+								text: "クイズ",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "占い",
-									text: "占い",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "占い",
+								text: "占い",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "挨拶",
-									text: "挨拶",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "挨拶",
+								text: "挨拶",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "質問",
-									text: "質問",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "質問",
+								text: "質問",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "地震情報",
-									text: "地震",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "地震情報",
+								text: "地震",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "やることリスト",
-									text: "やることリスト",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "やることリスト",
+								text: "やることリスト",
 							},
-						],
-					},
+						},
+					],
 				},
-			],
-		});
+			},
+		]);
 	} else if (userMessage === "1" || userMessage === "天気") {
 		try {
 			const forecast = await getWeatherForecast(config.weather_zone);
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{ type: "text", text: `【${forecast.targetArea}の天気予報】` },
-					{ type: "text", text: forecast.text },
-					{
-						type: "text",
-						text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: `【${forecast.targetArea}の天気予報】` },
+				{ type: "text", text: forecast.text },
+				{
+					type: "text",
+					text: `発表時刻: ${new Date(forecast.reportDatetime).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}(日本時間)\n発表者: ${forecast.publishingOffice}`,
+				},
+			]);
 		} catch (error) {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。",
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: "申し訳ありません。天気予報の取得に失敗しました。\n天気ゾーンなどの設定をご確認ください。" },
+			]);
 		}
 	} else if (userMessage === "2" || userMessage === "クイズ") {
 		const userId = event.source?.userId || "anonymous";
@@ -593,17 +519,11 @@ const textEventHandler = async (
 		});
 		const firstQuestion = QUIZ_QUESTIONS[firstQuestionId];
 
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "クイズを開始します！スコアは0点にリセットされました。",
-				},
-				{ type: "text", text: firstQuestion.question },
-				{ type: "text", text: "答えを入力してください！" },
-			],
-		});
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "クイズを開始します！スコアは0点にリセットされました。" },
+			{ type: "text", text: firstQuestion.question },
+			{ type: "text", text: "答えを入力してください！" },
+		]);
 	} else if (userMessage === "3" || userMessage === "占い") {
 		const fortunes = [
 			"今日はとても良い日になりそうです！",
@@ -615,86 +535,71 @@ const textEventHandler = async (
 		const luckyColors = ["赤", "青", "緑", "黄", "紫", "ピンク", "オレンジ"];
 		const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
 		const luckyColor = luckyColors[Math.floor(Math.random() * luckyColors.length)];
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{ type: "text", text: `今日の運勢：${fortune}` },
-				{ type: "text", text: `ラッキーカラー：${luckyColor}` },
-			],
-		});
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: `今日の運勢：${fortune}` },
+			{ type: "text", text: `ラッキーカラー：${luckyColor}` },
+		]);
 	} else if (userMessage === "4" || userMessage === "挨拶") {
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "以下のボタンから挨拶を選択してください。",
-					quickReply: {
-						items: [
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "ありがとう",
-									text: "ありがとう",
-								},
+		await sendMessage(event.replyToken, [
+			{
+				type: "text",
+				text: "以下のボタンから挨拶を選択してください。",
+				quickReply: {
+					items: [
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "ありがとう",
+								text: "ありがとう",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "さようなら",
-									text: "さようなら",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "さようなら",
+								text: "さようなら",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "おはよう",
-									text: "おはよう",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "おはよう",
+								text: "おはよう",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "こんにちは",
-									text: "こんにちは",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "こんにちは",
+								text: "こんにちは",
 							},
-							{
-								type: "action",
-								action: {
-									type: "message",
-									label: "こんばんは",
-									text: "こんばんは",
-								},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "こんばんは",
+								text: "こんばんは",
 							},
-						],
-					},
+						},
+					],
 				},
-			],
-		});
+			},
+		]);
 	} else if (userMessage === "5" || userMessage === "質問") {
 		try {
 			const result = await model.generateContent(userMessage);
 			const response = await result.response;
 			const text = response.text();
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [{ type: "text", text }],
-			});
+			await sendMessage(event.replyToken, [{ type: "text", text }]);
 		} catch (error) {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "申し訳ありません。AIの応答に失敗しました。",
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: "申し訳ありません。AIの応答に失敗しました。" },
+			]);
 		}
 	} else if (userMessage === "6" || userMessage === "地震") {
 		try {
@@ -711,37 +616,19 @@ const textEventHandler = async (
 				"-------------------"
 			).join("\n");
 
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: `【最新の地震情報】\n\n${message}`,
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: `【最新の地震情報】\n\n${message}` },
+			]);
 		} catch (error) {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "申し訳ありません。地震情報の取得に失敗しました。",
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: "申し訳ありません。地震情報の取得に失敗しました。" },
+			]);
 		}
 	} else if (userMessage === "7" || userMessage === "やることリスト") {
 		// やることリストの処理
-		await client.replyMessage({
-			replyToken: event.replyToken,
-			messages: [
-				{
-					type: "text",
-					text: "やることリスト機能は現在開発中です。",
-				},
-			],
-		});
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "やることリスト機能は現在開発中です。" },
+		]);
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
 
@@ -753,9 +640,9 @@ const textEventHandler = async (
 			await update(ref, { current_question: nextQuestionId });
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
 			const nextQuestionMessage = [
-				{ type: "textV2" as const, text: "次の問題です！" },
-				{ type: "textV2" as const, text: `Q. ${nextQuestion.question}` },
-				{ type: "textV2" as const, text: "答えを入力してください！" },
+				{ type: "text", text: "次の問題です！" },
+				{ type: "text", text: `Q. ${nextQuestion.question}` },
+				{ type: "text", text: "答えを入力してください！" },
 			];
 
 			// スコアが未定義の場合は0で初期化
@@ -769,43 +656,22 @@ const textEventHandler = async (
 				await update(quizScoreRef, {
 					[userId]: (config.user_scores[userId] ?? 0) + 10,
 				});
-				await client.replyMessage({
-					replyToken: event.replyToken,
-					messages: [
-						{ type: "textV2" as const, text: "正解です！" },
-						{
-							type: "textV2" as const,
-							text: `+10点！ 現在のスコア: ${config.user_scores[userId]}点`,
-						},
-						...nextQuestionMessage,
-					],
-				});
+				await sendMessage(event.replyToken, [
+					{ type: "text", text: "正解です！" },
+					{ type: "text", text: `+10点！ 現在のスコア: ${config.user_scores[userId]}点` },
+					...nextQuestionMessage,
+				]);
 			} else {
-				await client.replyMessage({
-					replyToken: event.replyToken,
-					messages: [
-						{
-							type: "textV2" as const,
-							text: `残念ながら不正解です。\n正解は「${currentQuestion.answer}」でした。`,
-						},
-						{
-							type: "textV2" as const,
-							text: `現在のスコア: ${config.user_scores[userId]}点`,
-						},
-						...nextQuestionMessage,
-					],
-				});
+				await sendMessage(event.replyToken, [
+					{ type: "text", text: `残念ながら不正解です。\n正解は「${currentQuestion.answer}」でした。` },
+					{ type: "text", text: `現在のスコア: ${config.user_scores[userId]}点` },
+					...nextQuestionMessage,
+				]);
 			}
 		} else {
-			await client.replyMessage({
-				replyToken: event.replyToken,
-				messages: [
-					{
-						type: "text",
-						text: "申し訳ありません。そのコマンドは認識できませんでした。\n「機能一覧」と入力して利用可能な機能を確認してください。",
-					},
-				],
-			});
+			await sendMessage(event.replyToken, [
+				{ type: "text", text: "申し訳ありません。そのコマンドは認識できませんでした。\n「機能一覧」と入力して利用可能な機能を確認してください。" },
+			]);
 		}
 	}
 };
