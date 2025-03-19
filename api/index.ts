@@ -257,37 +257,37 @@ const textEventHandler = async (
 		const result = Math.random() < 0.5 ? "Yes" : "No";
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: result }],
+			messages: [{ type: "text", text: result }],
 		});
 	} else if (userMessage === "数字") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: String(Math.random()) }],
+			messages: [{ type: "text", text: String(Math.random()) }],
 		});
 	} else if (/ありがとう/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: "どういたしまして" }],
+			messages: [{ type: "text", text: "どういたしまして" }],
 		});
 	} else if (/さようなら/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: "またね" }],
+			messages: [{ type: "text", text: "またね" }],
 		});
 	} else if (/おはよう/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: "おはよう" }],
+			messages: [{ type: "text", text: "おはよう" }],
 		});
 	} else if (/こんにちは/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: "こんにちは" }],
+			messages: [{ type: "text", text: "こんにちは" }],
 		});
 	} else if (/こんばんは/.test(userMessage)) {
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: "こんばんは" }],
+			messages: [{ type: "text", text: "こんばんは" }],
 		});
 	} else if (userMessage === "占い") {
 		const fortunes = [
@@ -299,13 +299,12 @@ const textEventHandler = async (
 		];
 		const luckyColors = ["赤", "青", "緑", "黄", "紫", "ピンク", "オレンジ"];
 		const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-		const luckyColor =
-			luckyColors[Math.floor(Math.random() * luckyColors.length)];
+		const luckyColor = luckyColors[Math.floor(Math.random() * luckyColors.length)];
 		await client.replyMessage({
 			replyToken: event.replyToken,
 			messages: [
-				{ type: "textV2", text: `今日の運勢：${fortune}` },
-				{ type: "textV2", text: `ラッキーカラー：${luckyColor}` },
+				{ type: "text", text: `今日の運勢：${fortune}` },
+				{ type: "text", text: `ラッキーカラー：${luckyColor}` },
 			],
 		});
 	} else if (userMessage === "クイズ") {
@@ -328,11 +327,11 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [
 				{
-					type: "textV2",
+					type: "text",
 					text: "クイズを開始します！スコアは0点にリセットされました。",
 				},
-				{ type: "textV2", text: firstQuestion.question },
-				{ type: "textV2", text: "答えを入力してください！" },
+				{ type: "text", text: firstQuestion.question },
+				{ type: "text", text: "答えを入力してください！" },
 			],
 		});
 	} else if (userMessage === "クイズ終了") {
@@ -340,7 +339,7 @@ const textEventHandler = async (
 		await update(ref, { quiz_status: false });
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: "クイズを終了しました！" }],
+			messages: [{ type: "text", text: "クイズを終了しました！" }],
 		});
 	} else if (userMessage === "次のクイズ") {
 		if (config.quiz_status) {
@@ -351,9 +350,9 @@ const textEventHandler = async (
 			await client.replyMessage({
 				replyToken: event.replyToken,
 				messages: [
-					{ type: "textV2", text: "次の問題です！" },
-					{ type: "textV2", text: `Q. ${nextQuestion.question}` },
-					{ type: "textV2", text: "答えを入力してください！" },
+					{ type: "text", text: "次の問題です！" },
+					{ type: "text", text: `Q. ${nextQuestion.question}` },
+					{ type: "text", text: "答えを入力してください！" },
 				],
 			});
 		} else {
@@ -361,7 +360,7 @@ const textEventHandler = async (
 				replyToken: event.replyToken,
 				messages: [
 					{
-						type: "textV2",
+						type: "text",
 						text: "クイズを開始するには「クイズ」と入力してください。",
 					},
 				],
@@ -382,7 +381,7 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [
 				{
-					type: "textV2",
+					type: "text",
 					text: `あなたの現在のスコアは ${config.user_scores[userId]} 点です！`,
 				},
 			],
@@ -394,7 +393,7 @@ const textEventHandler = async (
 		});
 		await client.replyMessage({
 			replyToken: event.replyToken,
-			messages: [{ type: "textV2", text: "スコアをリセットしました！" }],
+			messages: [{ type: "text", text: "スコアをリセットしました！" }],
 		});
 	} else if (userMessage === "!!db") {
 		// デバッグ用　データベース出力
@@ -598,11 +597,11 @@ const textEventHandler = async (
 			replyToken: event.replyToken,
 			messages: [
 				{
-					type: "textV2",
+					type: "text",
 					text: "クイズを開始します！スコアは0点にリセットされました。",
 				},
-				{ type: "textV2", text: firstQuestion.question },
-				{ type: "textV2", text: "答えを入力してください！" },
+				{ type: "text", text: firstQuestion.question },
+				{ type: "text", text: "答えを入力してください！" },
 			],
 		});
 	} else if (userMessage === "3" || userMessage === "占い") {
@@ -754,9 +753,9 @@ const textEventHandler = async (
 			await update(ref, { current_question: nextQuestionId });
 			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
 			const nextQuestionMessage = [
-				{ type: "text" as const, text: "次の問題です！" },
-				{ type: "text" as const, text: `Q. ${nextQuestion.question}` },
-				{ type: "text" as const, text: "答えを入力してください！" },
+				{ type: "textV2" as const, text: "次の問題です！" },
+				{ type: "textV2" as const, text: `Q. ${nextQuestion.question}` },
+				{ type: "textV2" as const, text: "答えを入力してください！" },
 			];
 
 			// スコアが未定義の場合は0で初期化
@@ -773,9 +772,9 @@ const textEventHandler = async (
 				await client.replyMessage({
 					replyToken: event.replyToken,
 					messages: [
-						{ type: "text" as const, text: "正解です！" },
+						{ type: "textV2" as const, text: "正解です！" },
 						{
-							type: "text" as const,
+							type: "textV2" as const,
 							text: `+10点！ 現在のスコア: ${config.user_scores[userId]}点`,
 						},
 						...nextQuestionMessage,
@@ -786,11 +785,11 @@ const textEventHandler = async (
 					replyToken: event.replyToken,
 					messages: [
 						{
-							type: "text" as const,
+							type: "textV2" as const,
 							text: `残念ながら不正解です。\n正解は「${currentQuestion.answer}」でした。`,
 						},
 						{
-							type: "text" as const,
+							type: "textV2" as const,
 							text: `現在のスコア: ${config.user_scores[userId]}点`,
 						},
 						...nextQuestionMessage,
