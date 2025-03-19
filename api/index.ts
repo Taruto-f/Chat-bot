@@ -803,7 +803,13 @@ const textEventHandler = async (
 					...nextQuestionMessage,
 				]);
 			}
-		}
+		} else {
+			await sendMessage(event.replyToken, [
+				{
+					type: "text",
+					text: "申し訳ありません。そのコマンドは認識できませんでした。\n「機能一覧」と入力して利用可能な機能を確認してください。",
+				},
+			]);
 		}
 	}
 };
