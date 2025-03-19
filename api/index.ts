@@ -278,9 +278,6 @@ const textEventHandler = async (
 				text: msg.text,
 				emojis: msg.emojis,
 				quickReply: msg.quickReply,
-				sender: {
-					name: "test",
-				},
 			})),
 			notificationDisabled: config.is_silent,
 		});
