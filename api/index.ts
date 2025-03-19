@@ -667,6 +667,76 @@ const textEventHandler = async (
 				],
 			});
 		}
+	} else if (userMessage === "機能") {
+		await client.replyMessage({
+			replyToken: event.replyToken,
+			messages: [
+				{
+					type: "text",
+					text: "以下のボタンから機能を選択してください。",
+					quickReply: {
+						items: [
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "天気予報",
+									text: "天気",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "クイズ",
+									text: "クイズ",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "占い",
+									text: "占い",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "挨拶",
+									text: "挨拶",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "質問",
+									text: "質問",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "地震情報",
+									text: "地震",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "やることリスト",
+									text: "やることリスト",
+								},
+							},
+						],
+					},
+				},
+			],
+		});
 	} else if (userMessage === "機能一覧") {
 		await client.replyMessage({
 			replyToken: event.replyToken,
@@ -679,7 +749,8 @@ const textEventHandler = async (
 						"3. 占い\n" +
 						"4. 挨拶\n" +
 						"5. AI質問\n" +
-						"6. やることリスト\n\n" +
+						"6. 地震情報\n" +
+						"7. やることリスト\n\n" +
 						"各機能を使用するには、以下のボタンから選択してください。",
 					quickReply: {
 						items: [
@@ -721,6 +792,14 @@ const textEventHandler = async (
 									type: "message",
 									label: "質問",
 									text: "質問",
+								},
+							},
+							{
+								type: "action",
+								action: {
+									type: "message",
+									label: "地震情報",
+									text: "地震",
 								},
 							},
 							{
@@ -841,6 +920,38 @@ const textEventHandler = async (
 				},
 			],
 		});
+	} else if (userMessage === "地震") {
+		try {
+			const earthquakeData = await getEarthquakeInfo();
+			const message = earthquakeData.map(quake => 
+				`発生時刻: ${new Date(quake.time).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}\n` +
+				`場所: ${quake.location}\n` +
+				`マグニチュード: ${quake.magnitude}\n` +
+				`深さ: ${quake.depth}km\n` +
+				`震度: ${quake.intensity}\n` +
+				"-------------------"
+			).join("\n");
+
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: `【最新の地震情報】\n\n${message}`,
+					},
+				],
+			});
+		} catch (error) {
+			await client.replyMessage({
+				replyToken: event.replyToken,
+				messages: [
+					{
+						type: "text",
+						text: "申し訳ありません。地震情報の取得に失敗しました。",
+					},
+				],
+			});
+		}
 	} else {
 		const userId = event.source?.userId ?? "anonymous";
 
@@ -999,6 +1110,22 @@ const textEventHandler = async (
 											text: "質問",
 										},
 									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "地震情報",
+											text: "地震",
+										},
+									},
+									{
+										type: "action",
+										action: {
+											type: "message",
+											label: "やることリスト",
+											text: "やることリスト",
+										},
+									},
 								],
 							},
 						},
@@ -1058,17 +1185,6 @@ app.post(
 		res.status(200).json({ status: "success", results });
 	},
 );
-
-// 地震情報を取得するエンドポイント
-app.get("/api/earthquake", async (req: Request, res: Response) => {
-	try {
-		const earthquakeData = await getEarthquakeInfo();
-		res.json(earthquakeData);
-	} catch (error) {
-		console.error('地震情報の取得に失敗しました:', error);
-		res.status(500).json({ error: '地震情報の取得に失敗しました' });
-	}
-});
 
 // ✅ サーバー起動
 app.listen(PORT, () => {
