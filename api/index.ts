@@ -796,55 +796,81 @@ const textEventHandler = async (
 			]);
 		}
 	} else {
-		const userId = event.source?.userId ?? "anonymous";
-
-		// クイズがアクティブな場合のみ答えをチェック!
-		if (config.quiz_status) {
-			const currentQuestion = QUIZ_QUESTIONS[config.current_question];
-			const userAnswer = userMessage.trim();
-			const nextQuestionId = getNextQuestion();
-			await update(ref, { current_question: nextQuestionId });
-			const nextQuestion = QUIZ_QUESTIONS[nextQuestionId];
-			const nextQuestionMessage: MessageType[] = [
-				{ type: "text", text: "次の問題です！" },
-				{ type: "text", text: `Q. ${nextQuestion.question}` },
-				{ type: "text", text: "答えを入力してください！" },
-			];
-
-			// スコアが未定義の場合は0で初期化
-			if (config.user_scores[userId] === undefined) {
-				await update(quizScoreRef, {
-					[userId]: 0,
-				});
-			}
-
-			if (userAnswer === currentQuestion.answer) {
-				await update(quizScoreRef, {
-					[userId]: (config.user_scores[userId] ?? 0) + 10,
-				});
-				await sendMessage(event.replyToken, [
-					{ type: "text", text: "正解です！" },
-					{
-						type: "text",
-						text: `+10点！ 現在のスコア: ${config.user_scores[userId]}点`,
-					},
-					...nextQuestionMessage,
-				]);
-			} else {
-				await sendMessage(event.replyToken, [
-					{
-						type: "text",
-						text: `残念ながら不正解です。\n正解は「${currentQuestion.answer}」でした。`,
-					},
-					{
-						type: "text",
-						text: `現在のスコア: ${config.user_scores[userId]}点`,
-					},
-					...nextQuestionMessage,
-				]);
-			}
-		} 
-		}
+		await sendMessage(event.replyToken, [
+			{
+				type: "text",
+				text:
+					"以下の機能が利用できます：\n\n" +
+					"1. 天気予報\n" +
+					"2. クイズ\n" +
+					"3. 占い\n" +
+					"4. 挨拶\n" +
+					"5. AI質問\n" +
+					"6. 地震情報\n" +
+					"7. やることリスト\n\n" +
+					"各機能を使用するには、番号を入力するか、以下のボタンから選択してください。",
+				quickReply: {
+					items: [
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "天気予報",
+								text: "天気",
+							},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "クイズ",
+								text: "クイズ",
+							},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "占い",
+								text: "占い",
+							},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "挨拶",
+								text: "挨拶",
+							},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "質問",
+								text: "質問",
+							},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "地震情報",
+								text: "地震",
+							},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "やることリスト",
+								text: "やることリスト",
+							},
+						},
+					],
+				},
+			},
+		]);
 	}
 };
 
