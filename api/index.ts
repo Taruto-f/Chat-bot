@@ -434,11 +434,11 @@ const textEventHandler = async (
 				replyToken: event.replyToken,
 				messages: [
 					{
-						type: "textV2",
+						type: "text",
 						text: "「天気ゾーン (ゾーン番号)」と入力することで天気ゾーンを設定できます。\n天気ゾーン一覧はこちら: https://x.gd/lhdUU",
 					},
 					{
-						type: "textV2",
+						type: "text",
 						text: `現在の天気ゾーン: ${config.weather_zone}`,
 					},
 				],
@@ -454,11 +454,11 @@ const textEventHandler = async (
 						replyToken: event.replyToken,
 						messages: [
 							{
-								type: "textV2",
+								type: "text",
 								text: `天気ゾーンを${zone}に設定しました。`,
 							},
 							{
-								type: "textV2",
+								type: "text",
 								text: `地域: ${weather.targetArea}\n発表者: ${weather.publishingOffice}`,
 							},
 						],
@@ -468,11 +468,12 @@ const textEventHandler = async (
 						replyToken: event.replyToken,
 						messages: [
 							{
-								type: "textV2",
+								type: "text",
 								text: "天気ゾーンが正しく入力されていません。\n「天気ゾーン (ゾーン番号)」と入力してください。\nゾーン番号は6桁の半角数字です。",
 							},
 						],
 					});
+				}
 			}
 		}
 	} else if (userMessage === "機能一覧") {
