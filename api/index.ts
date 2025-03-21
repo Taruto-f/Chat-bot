@@ -261,7 +261,9 @@ const textEventHandler = async (
 
 	if (event.type === 'message' && event.message.type === 'sticker') {
 		if (!event.replyToken) return;
-		await sendMessage(event.replyToken, [{ type: "text", text: "かわいいスタンプですね！👍" }]);
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: "かわいいスタンプですね！👍" }
+		], "スタンプ応答");
 		return;
 	}
 
