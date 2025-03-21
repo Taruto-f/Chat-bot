@@ -253,6 +253,18 @@ const textEventHandler = async (
 	event: webhook.Event,
 	ref: Reference,
 ): Promise<MessageAPIResponseBase | undefined> => {
+	if (event.type === 'message' && event.message.type === 'image') {
+		if (!event.replyToken) return;
+		await sendMessage(event.replyToken, [{ type: "text", text: "画像を受け取りました！📷" }]);
+		return;
+	}
+
+	if (event.type === 'message' && event.message.type === 'sticker') {
+		if (!event.replyToken) return;
+		await sendMessage(event.replyToken, [{ type: "text", text: "かわいいスタンプですね！👍" }]);
+		return;
+	}
+
 	if (event.type !== "message" || event.message.type !== "text") {
 		return;
 	}
