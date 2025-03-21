@@ -261,8 +261,19 @@ const textEventHandler = async (
 
 	if (event.type === 'message' && event.message.type === 'sticker') {
 		if (!event.replyToken) return;
+		const stickerId = event.message.stickerId;
+		const packageId = event.message.packageId;
+
+		let replyText = 'スタンプを受け取りました！';
+
+		if (packageId === '11537' && stickerId === '52002734') {
+			replyText = 'このスタンプ、かわいいですね！💕';
+		} else if (packageId === '11538' && stickerId === '51626494') {
+			replyText = 'おもしろいスタンプですね！😆';
+		}
+
 		await sendMessage(event.replyToken, [
-			{ type: "text", text: "かわいいスタンプですね！👍" }
+			{ type: "text", text: replyText }
 		], "スタンプ応答");
 		return;
 	}
