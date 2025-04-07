@@ -19,6 +19,7 @@ import { defaultConfig, type Config } from "./config";
 import { get } from "./db";
 import { getWeatherForecast } from "./weather";
 import { getEarthquakeInfo } from "./earthquake";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // LINE Bot の設定
 const serviceAccount: Record<string, string> = JSON.parse(
@@ -40,7 +41,6 @@ const PORT = process.env.PORT ?? 3000;
 
 //gemini
 // const { GoogleGenerativeAI } = require("@google/generative-ai");
-import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API ?? "");
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
