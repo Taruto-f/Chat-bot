@@ -449,13 +449,19 @@ const textEventHandler = async (
 					text: "タスクの内容を入力してください。\n例：やることリスト追加 買い物に行く",
 				},
 			]);
-		} else {
-			const updatedList = [...(config.todo_list || []), newTask];
-			await update(ref, { todo_list: updatedList });
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: `タスク「${newTask}」を追加しました。` },
-			]);
+			return;
 		}
+
+		// やることリストが未定義の場合は空配列で初期化
+		if (!config.todo_list) {
+			await update(ref, { todo_list: [] });
+		}
+
+		const updatedList = [...(config.todo_list || []), newTask];
+		await update(ref, { todo_list: updatedList });
+		await sendMessage(event.replyToken, [
+			{ type: "text", text: `タスク「${newTask}」を追加しました。` },
+		]);
 		return;
 	}
 
