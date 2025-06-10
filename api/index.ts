@@ -332,47 +332,28 @@ const textEventHandler = async (
 		return;
 	}
 
-	// やることリストの処理
-	if (userMessage === "7" || userMessage === "やることリスト") {
-		// クイズがアクティブな場合は、やることリストの操作を無効化
-		if (config.quiz_status) {
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: "クイズが進行中です。やることリストの操作は、クイズを終了してから行ってください。",
-				},
-			]);
-			return;
-		}
-
+	// やることリストの処理を削除
+	if (userMessage === "7" || userMessage === "設定") {
 		await sendMessage(event.replyToken, [
 			{
 				type: "text",
-				text: "やることリストの操作を選択してください：",
+				text: "設定メニューを選択してください：",
 				quickReply: {
 					items: [
 						{
 							type: "action",
 							action: {
 								type: "message",
-								label: "表示",
-								text: "やることリスト表示",
+								label: "通知設定",
+								text: "通知設定",
 							},
 						},
 						{
 							type: "action",
 							action: {
 								type: "message",
-								label: "追加",
-								text: "やることリスト追加",
-							},
-						},
-						{
-							type: "action",
-							action: {
-								type: "message",
-								label: "削除",
-								text: "やることリスト削除",
+								label: "天気ゾーン設定",
+								text: "天気ゾーン",
 							},
 						},
 					],
@@ -382,151 +363,34 @@ const textEventHandler = async (
 		return;
 	}
 
-	// やることリストの表示
-	if (userMessage === "やることリスト表示") {
-		if (config.quiz_status) {
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: "クイズが進行中です。やることリストの操作は、クイズを終了してから行ってください。",
-				},
-			]);
-			return;
-		}
-
-		if (config.todo_list.length === 0) {
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: "やることリストは空です。" },
-			]);
-		} else {
-			const todoList = config.todo_list
-				.map((todo, index) => `${index + 1}. ${todo}`)
-				.join("\n");
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: `【やることリスト】\n${todoList}` },
-			]);
-		}
-		return;
-	}
-
-	// やることリストの追加
-	if (userMessage === "やることリスト追加") {
-		if (config.quiz_status) {
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: "クイズが進行中です。やることリストの操作は、クイズを終了してから行ってください。",
-				},
-			]);
-			return;
-		}
-
+	// 通知設定の処理
+	if (userMessage === "通知設定") {
 		await sendMessage(event.replyToken, [
 			{
 				type: "text",
-				text: "追加するタスクを入力してください。\n例：やることリスト追加 買い物に行く",
+				text: "通知の設定を選択してください：",
+				quickReply: {
+					items: [
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "通知オン",
+								text: "通知オン",
+							},
+						},
+						{
+							type: "action",
+							action: {
+								type: "message",
+								label: "通知オフ",
+								text: "通知オフ",
+							},
+						},
+					],
+				},
 			},
 		]);
-		return;
-	}
-
-	if (userMessage.startsWith("やることリスト追加 ")) {
-		if (config.quiz_status) {
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: "クイズが進行中です。やることリストの操作は、クイズを終了してから行ってください。",
-				},
-			]);
-			return;
-		}
-
-		const newTask = userMessage.replace("やることリスト追加 ", "").trim();
-		if (newTask === "") {
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: "タスクの内容を入力してください。\n例：やることリスト追加 買い物に行く",
-				},
-			]);
-			return;
-		}
-
-		// やることリストが未定義の場合は空配列で初期化
-		if (!config.todo_list) {
-			await update(ref, { todo_list: [] });
-		}
-
-		const updatedList = [...(config.todo_list || []), newTask];
-		await update(ref, { todo_list: updatedList });
-		await sendMessage(event.replyToken, [
-			{ type: "text", text: `タスク「${newTask}」を追加しました。` },
-		]);
-		return;
-	}
-
-	// やることリストの削除
-	if (userMessage === "やることリスト削除") {
-		if (config.quiz_status) {
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: "クイズが進行中です。やることリストの操作は、クイズを終了してから行ってください。",
-				},
-			]);
-			return;
-		}
-
-		if (config.todo_list.length === 0) {
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: "やることリストは空です。" },
-			]);
-		} else {
-			const todoList = config.todo_list
-				.map((todo, index) => `${index + 1}. ${todo}`)
-				.join("\n");
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: `削除するタスクの番号を入力してください。\n\n【やることリスト】\n${todoList}`,
-				},
-			]);
-		}
-		return;
-	}
-
-	if (userMessage.startsWith("やることリスト削除 ")) {
-		if (config.quiz_status) {
-			await sendMessage(event.replyToken, [
-				{
-					type: "text",
-					text: "クイズが進行中です。やることリストの操作は、クイズを終了してから行ってください。",
-				},
-			]);
-			return;
-		}
-
-		const taskNumber = Number.parseInt(
-			userMessage.replace("やることリスト削除 ", "").trim(),
-		);
-		if (
-			Number.isNaN(taskNumber) ||
-			taskNumber < 1 ||
-			taskNumber > config.todo_list.length
-		) {
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: "正しいタスク番号を入力してください。" },
-			]);
-		} else {
-			const deletedTask = config.todo_list[taskNumber - 1];
-			const updatedList = config.todo_list.filter(
-				(_, index) => index !== taskNumber - 1,
-			);
-			await update(ref, { todo_list: updatedList });
-			await sendMessage(event.replyToken, [
-				{ type: "text", text: `タスク「${deletedTask}」を削除しました。` },
-			]);
-		}
 		return;
 	}
 
@@ -610,9 +474,11 @@ const textEventHandler = async (
 	// クイズ終了
 	if (userMessage === "クイズ終了") {
 		const userId = event.source?.userId ?? "anonymous";
+		const finalScore = config.user_scores[userId] ?? 0;
 		await update(ref, { quiz_status: false });
 		await sendMessage(event.replyToken, [
 			{ type: "text", text: "クイズを終了しました！" },
+			{ type: "text", text: `最終スコア: ${finalScore}点` },
 		]);
 		return;
 	}
@@ -805,7 +671,7 @@ const textEventHandler = async (
 					"4. 挨拶\n" +
 					"5. AI質問\n" +
 					"6. 地震情報\n" +
-					"7. やることリスト\n\n" +
+					"7. 設定\n\n" +
 					"各機能を使用するには、番号を入力するか、以下のボタンから選択してください。",
 				quickReply: {
 					items: [
@@ -861,8 +727,8 @@ const textEventHandler = async (
 							type: "action",
 							action: {
 								type: "message",
-								label: "やることリスト",
-								text: "やることリスト",
+								label: "設定",
+								text: "設定",
 							},
 						},
 					],
